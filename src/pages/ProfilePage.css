@@ -1,0 +1,258 @@
+/* Token aliases so core components render with the brand palette.
+   Mirrors the pattern in HomePage.css and pages/auth/authShared.css. */
+.profile-page {
+  --text-main: var(--text-h);
+  --text-sub: var(--text);
+  --bg-main: var(--bg);
+  --bg-card: var(--bg);
+  --primary: color-mix(in srgb, var(--accent) 82%, black);
+  --primary-hover: color-mix(in srgb, var(--accent) 68%, black);
+  --radius: 0.75rem;
+  --radius-sm: 0.5rem;
+  --shadow-sm: var(--shadow);
+  --shadow-md: var(--shadow);
+  --danger: #dc2626;
+
+  width: 90%;
+  max-width: 640px;
+  margin: 3rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  text-align: left;
+  animation: profile-enter 0.4s ease-out;
+}
+
+.profile-page-header {
+  margin: 0;
+}
+
+.profile-page-title {
+  font-family: var(--heading);
+  font-weight: 600;
+  color: var(--text-h);
+  font-size: 2rem;
+  line-height: 1.15;
+  letter-spacing: -0.72px;
+  margin: 0 0 0.5rem;
+}
+
+.profile-page-subtitle {
+  color: var(--text);
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Cards — lift the core Card with an accent top border to match auth pages. */
+.profile-page .profile-card {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: 1.125rem;
+  background: var(--bg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.profile-page .profile-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--accent) 0%,
+    color-mix(in srgb, var(--accent) 35%, transparent) 100%
+  );
+}
+
+.profile-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.25rem 0;
+  min-height: 2rem;
+}
+
+.profile-row + .profile-row {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--border);
+}
+
+.profile-row-label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.profile-row-value {
+  color: var(--text-h);
+  font-size: 1rem;
+  text-align: right;
+  word-break: break-word;
+}
+
+.profile-row-value-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* Balance */
+.profile-balance {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  color: var(--text-h);
+}
+
+.profile-balance-number {
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-family: var(--heading);
+  color: var(--text-h);
+}
+
+.profile-balance-unit {
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.profile-balance-unavailable {
+  color: var(--text);
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* Buy tokens link — subtle pill with accent hover. */
+.profile-buy-tokens {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.85rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  color: var(--text-h);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.profile-buy-tokens:hover,
+.profile-buy-tokens:focus-visible {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+/* Inline edit form for display name. */
+.profile-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 360px;
+}
+
+.profile-edit-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.profile-page .input {
+  padding: 0.7rem 0.9rem;
+  border-radius: 0.625rem;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.profile-page .input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+.profile-page .btn-primary {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 14px var(--accent-border);
+}
+
+.profile-page .btn-primary:hover:not(:disabled),
+.profile-page .btn-primary:focus-visible {
+  background: var(--primary-hover);
+  box-shadow: 0 8px 22px var(--accent-border);
+}
+
+.profile-page .btn-secondary {
+  background: transparent;
+  color: var(--text-h);
+  border: 1px solid var(--border);
+}
+
+.profile-page .btn-secondary:hover:not(:disabled),
+.profile-page .btn-secondary:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.profile-page .alert {
+  border-radius: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.profile-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@keyframes profile-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-page,
+  .profile-page *,
+  .profile-page *::before {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .profile-page {
+    margin: 1.5rem auto;
+  }
+  .profile-page-title {
+    font-size: 1.625rem;
+    letter-spacing: -0.48px;
+  }
+  .profile-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+  .profile-row-value,
+  .profile-row-value-group {
+    text-align: left;
+    justify-content: flex-start;
+  }
+}

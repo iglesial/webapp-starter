@@ -1,0 +1,22 @@
+{
+  "version": "1.4",
+  "auth": {
+    "user_pool_id": "REPLACE_AFTER_SANDBOX_DEPLOY",
+    "aws_region": "REPLACE_AFTER_SANDBOX_DEPLOY",
+    "user_pool_client_id": "REPLACE_AFTER_SANDBOX_DEPLOY",
+    "identity_pool_id": "REPLACE_AFTER_SANDBOX_DEPLOY",
+    "mfa_methods": [],
+    "standard_required_attributes": ["email"],
+    "username_attributes": ["email"],
+    "user_verification_types": ["email"],
+    "mfa_configuration": "NONE",
+    "password_policy": {
+      "min_length": 8,
+      "require_lowercase": true,
+      "require_numbers": true,
+      "require_symbols": false,
+      "require_uppercase": true
+    },
+    "unauthenticated_identities_enabled": true
+  }
+}

@@ -1,0 +1,158 @@
+.hero {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: linear-gradient(135deg, #fff5f0 0%, #ffffff 50%, #fef3f2 100%);
+  overflow: hidden;
+}
+
+/* Gradient overlay effect */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(249, 115, 22, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(234, 88, 12, 0.06) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  width: 100%;
+  padding: 0 1.5rem;
+  animation: fadeIn 0.6s ease-out;
+}
+
+.hero-title {
+  margin: 0 0 1.5rem 0;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.hero-subtitle {
+  margin: 0 0 2.5rem 0;
+  color: var(--text-sub);
+  line-height: 1.6;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Size variants */
+.hero-small {
+  padding: 3rem 1rem;
+}
+
+.hero-small .hero-title {
+  font-size: 2rem;
+}
+
+.hero-small .hero-subtitle {
+  font-size: 1rem;
+}
+
+.hero-medium {
+  padding: 4rem 1rem;
+}
+
+.hero-medium .hero-title {
+  font-size: 2.5rem;
+}
+
+.hero-medium .hero-subtitle {
+  font-size: 1.125rem;
+}
+
+.hero-large {
+  padding: 5rem 1rem 6rem;
+}
+
+.hero-large .hero-title {
+  font-size: 3rem;
+}
+
+.hero-large .hero-subtitle {
+  font-size: 1.25rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero-small {
+    padding: 2rem 1rem;
+  }
+
+  .hero-small .hero-title {
+    font-size: 1.75rem;
+  }
+
+  .hero-small .hero-subtitle {
+    font-size: 0.9375rem;
+  }
+
+  .hero-medium {
+    padding: 3rem 1rem;
+  }
+
+  .hero-medium .hero-title {
+    font-size: 2rem;
+  }
+
+  .hero-medium .hero-subtitle {
+    font-size: 1rem;
+  }
+
+  .hero-large {
+    padding: 4rem 1rem;
+  }
+
+  .hero-large .hero-title {
+    font-size: 2rem;
+  }
+
+  .hero-large .hero-subtitle {
+    font-size: 1rem;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .hero-actions > * {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-small .hero-title {
+    font-size: 1.5rem;
+  }
+
+  .hero-medium .hero-title {
+    font-size: 1.75rem;
+  }
+
+  .hero-large .hero-title {
+    font-size: 1.75rem;
+  }
+}
