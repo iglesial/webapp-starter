@@ -1,3 +1,4 @@
+import { Trans, useTranslation } from 'react-i18next';
 import type { ReactNode } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Alert } from '../core/Alert';
@@ -18,13 +19,13 @@ export function AdminOnlyRoute({ children }: AdminOnlyRouteProps) {
 }
 
 function AdminGate({ children }: { children?: ReactNode }) {
+  const { t } = useTranslation();
   const { isAdmin } = useAuth();
   if (!isAdmin) {
     return (
-      <div className="admin-only-denied" role="region" aria-label="Access denied">
-        <Alert type="warning" title="Admin access required">
-          You need admin access to view this page. If you believe this is a
-          mistake, ask a project admin to add you to the <code>admin</code> group.
+      <div className="admin-only-denied" role="region" aria-label={t('adminGate.deniedRegion')}>
+        <Alert type="warning" title={t('adminGate.title')}>
+          <Trans i18nKey="adminGate.body" components={{ code: <code /> }} />
         </Alert>
       </div>
     );

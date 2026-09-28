@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Trans, useTranslation } from 'react-i18next';
 import { Alert } from '../../components/core/Alert';
 import { Button } from '../../components/core/Button';
 import { FormField } from '../../components/core/FormField';
@@ -10,37 +11,19 @@ import {
   resendConfirmationCode,
 } from '../../services/authService';
 import { isAuthFailure, type AuthErrorCode } from '../../types/auth';
+import { authErrorCopy } from '../../i18n/authErrors';
 import './authShared.css';
 import './ConfirmSignUpPage.css';
 
-function errorCopy(code: AuthErrorCode): { title: string; body: string } {
-  switch (code) {
-    case 'VERIFICATION_CODE_INVALID':
-      return {
-        title: 'That code does not match.',
-        body: 'Double-check the code from your email and try again.',
-      };
-    case 'VERIFICATION_CODE_EXPIRED':
-      return {
-        title: 'That code has expired.',
-        body: 'Request a new code — the last one is no longer valid.',
-      };
-    default:
-      return {
-        title: 'We could not confirm your account.',
-        body: 'Please try again or request a new code.',
-      };
-  }
-}
-
 export function ConfirmSignUpPage() {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const email = (location.state as { email?: string } | null)?.email ?? '';
 
   const [code, setCode] = useState('');
   const [topError, setTopError] = useState<AuthErrorCode | null>(null);
-  const [resendNotice, setResendNotice] = useState<string | null>(null);
+  const [resent, setResent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [resending, setResending] = useState(false);
 
@@ -51,7 +34,7 @@ export function ConfirmSignUpPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setTopError(null);
-    setResendNotice(null);
+    setResent(false);
     setSubmitting(true);
     const result = await confirmSignUpWithCode(email, code.trim());
     setSubmitting(false);
@@ -66,7 +49,7 @@ export function ConfirmSignUpPage() {
 
   async function handleResend() {
     setTopError(null);
-    setResendNotice(null);
+    setResent(false);
     setResending(true);
     const result = await resendConfirmationCode(email);
     setResending(false);
@@ -74,34 +57,38 @@ export function ConfirmSignUpPage() {
       setTopError(result.code);
       return;
     }
-    setResendNotice('A new code is on its way to your inbox.');
+    setResent(true);
   }
 
-  const topCopy = topError ? errorCopy(topError) : null;
+  const topCopy = topError ? authErrorCopy('confirmSignUp', topError) : null;
 
   return (
     <div className="auth-page confirm-page">
       <header>
-        <h1 className="auth-page-title">Check your email</h1>
+        <h1 className="auth-page-title">{t('auth.confirmSignUp.title')}</h1>
         <p className="auth-page-subtitle">
-          We sent a verification code to <strong>{email}</strong>.
+          <Trans
+            i18nKey="auth.confirmSignUp.subtitle"
+            values={{ email }}
+            components={{ b: <strong /> }}
+          />
         </p>
       </header>
 
       {topCopy && (
-        <Alert type="danger" title={topCopy.title}>
-          {topCopy.body}
+        <Alert type="danger" title={t(topCopy.title)}>
+          {t(topCopy.body)}
         </Alert>
       )}
 
-      {resendNotice && (
-        <Alert type="success" title="Code resent">
-          {resendNotice}
+      {resent && (
+        <Alert type="success" title={t('auth.confirmSignUp.resentTitle')}>
+          {t('auth.confirmSignUp.resentBody')}
         </Alert>
       )}
 
       <form className="auth-form" onSubmit={handleSubmit} noValidate>
-        <FormField label="Verification code" htmlFor="confirm-code" required>
+        <FormField label={t('auth.confirmSignUp.codeLabel')} htmlFor="confirm-code" required>
           <Input
             id="confirm-code"
             type="text"
@@ -116,7 +103,7 @@ export function ConfirmSignUpPage() {
 
         <div className="auth-form-actions">
           <Button type="submit" variant="primary" size="large" fullWidth disabled={submitting}>
-            {submitting ? <Spinner size="small" color="white" /> : 'Confirm account'}
+            {submitting ? <Spinner size="small" color="white" /> : t('auth.confirmSignUp.submit')}
           </Button>
           <Button
             type="button"
@@ -126,13 +113,13 @@ export function ConfirmSignUpPage() {
             disabled={resending}
             onClick={handleResend}
           >
-            {resending ? <Spinner size="small" /> : 'Resend code'}
+            {resending ? <Spinner size="small" /> : t('auth.confirmSignUp.resend')}
           </Button>
         </div>
       </form>
 
       <div className="auth-page-footer-links">
-        <Link to="/signup">Use a different email</Link>
+        <Link to="/signup">{t('auth.confirmSignUp.differentEmail')}</Link>
       </div>
     </div>
   );

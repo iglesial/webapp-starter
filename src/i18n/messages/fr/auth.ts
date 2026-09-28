@@ -1,0 +1,50 @@
+export const auth = {
+  passwordHint:
+    'Au moins 10 caractères, avec des majuscules, des minuscules et un chiffre.',
+  emailLabel: 'E-mail',
+  passwordLabel: 'Mot de passe',
+  displayNameLabel: 'Nom affiché',
+  displayNameHelper: '3 à 30 caractères. Vous pourrez le modifier depuis votre profil.',
+  signIn: {
+    title: 'Bon retour parmi nous',
+    subtitle: 'Connectez-vous pour reprendre là où vous en étiez.',
+    submit: 'Se connecter',
+    emailVerifiedTitle: 'E-mail vérifié',
+    emailVerifiedBody: 'Votre compte est prêt. Connectez-vous pour commencer.',
+    forgotPassword: 'Mot de passe oublié ?',
+    createAccount: 'Créer un compte',
+  },
+  signUp: {
+    title: 'Créez votre compte',
+    subtitle: 'Choisissez un nom affiché — c’est le nom que les autres verront.',
+    submit: 'Créer le compte',
+    haveAccount: 'Vous avez déjà un compte ? Connectez-vous',
+    signInLink: 'Se connecter',
+    resetLink: 'Réinitialiser le mot de passe',
+  },
+  confirmSignUp: {
+    title: 'Consultez votre boîte mail',
+    subtitle: 'Nous avons envoyé un code de vérification à <b>{{email}}</b>.',
+    codeLabel: 'Code de vérification',
+    submit: 'Confirmer le compte',
+    resend: 'Renvoyer le code',
+    resentTitle: 'Code renvoyé',
+    resentBody: 'Un nouveau code est en route vers votre boîte mail.',
+    differentEmail: 'Utiliser une autre adresse e-mail',
+  },
+  forgotPassword: {
+    title: 'Réinitialisez votre mot de passe',
+    subtitle: 'Saisissez l’e-mail de votre compte. Nous vous enverrons un code.',
+    submit: 'Envoyer le code',
+    backToSignIn: 'Retour à la connexion',
+  },
+  confirmReset: {
+    title: 'Définissez un nouveau mot de passe',
+    subtitle:
+      'Saisissez le code envoyé à <b>{{email}}</b> et choisissez un nouveau mot de passe.',
+    codeLabel: 'Code de réinitialisation',
+    newPasswordLabel: 'Nouveau mot de passe',
+    submit: 'Enregistrer le mot de passe',
+    requestNewCode: 'Demander un nouveau code',
+  },
+} as const;

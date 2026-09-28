@@ -38,6 +38,7 @@ const aliceUser: AuthUser = {
   email: 'alice@b.co',
   displayName: 'Alice',
   emailVerified: true,
+  locale: null,
   groups: [],
 };
 

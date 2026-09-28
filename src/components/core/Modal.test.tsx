@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Modal } from './Modal';
+import { rx } from '../../test/i18n';
 
 describe('Modal', () => {
   it('renders nothing when isOpen is false', () => {
@@ -83,7 +84,7 @@ describe('Modal', () => {
     render(
       <Modal isOpen={true} onClose={handleClose} title="Title">Content</Modal>
     );
-    await userEvent.click(screen.getByLabelText('Close'));
+    await userEvent.click(screen.getByLabelText(rx('common.close')));
     expect(handleClose).toHaveBeenCalledOnce();
   });
 

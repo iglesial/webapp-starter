@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import './Alert.css';
 
 export interface AlertProps {
@@ -9,6 +10,7 @@ export interface AlertProps {
 }
 
 export const Alert: React.FC<AlertProps> = ({ type = 'info', title, children, onClose }) => {
+  const { t } = useTranslation();
   return (
     <div className={`alert alert-${type}`} role="alert">
       <div className="alert-content">
@@ -16,7 +18,7 @@ export const Alert: React.FC<AlertProps> = ({ type = 'info', title, children, on
         <div className="alert-message">{children}</div>
       </div>
       {onClose && (
-        <button className="alert-close" onClick={onClose} aria-label="Close">
+        <button className="alert-close" onClick={onClose} aria-label={t('common.close')}>
           ×
         </button>
       )}

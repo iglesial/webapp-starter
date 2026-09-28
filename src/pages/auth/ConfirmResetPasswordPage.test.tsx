@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { confirmPasswordReset } from '../../services/authService';
+import { rx, rxIn } from '../../test/i18n';
 import { ConfirmResetPasswordPage } from './ConfirmResetPasswordPage';
 
 vi.mock('../../services/authService', () => ({
@@ -48,9 +49,9 @@ describe('ConfirmResetPasswordPage', () => {
     vi.mocked(confirmPasswordReset).mockResolvedValue({ ok: true, value: undefined });
     renderPage();
     const user = userEvent.setup();
-    await user.type(screen.getByLabelText(/reset code/i), '123456');
-    await user.type(screen.getByLabelText(/new password/i), 'Passw0rd!!');
-    await user.click(screen.getByRole('button', { name: /save new password/i }));
+    await user.type(screen.getByLabelText(rxIn('auth.confirmReset.codeLabel')), '123456');
+    await user.type(screen.getByLabelText(rxIn('auth.confirmReset.newPasswordLabel')), 'Passw0rd!!');
+    await user.click(screen.getByRole('button', { name: rx('auth.confirmReset.submit') }));
     await waitFor(() => expect(screen.getByTestId('landed')).toHaveTextContent('/signin|a@b.co'));
     expect(confirmPasswordReset).toHaveBeenCalledWith('a@b.co', '123456', 'Passw0rd!!');
   });
@@ -62,11 +63,17 @@ describe('ConfirmResetPasswordPage', () => {
     });
     renderPage();
     const user = userEvent.setup();
-    await user.type(screen.getByLabelText(/reset code/i), 'old');
-    await user.type(screen.getByLabelText(/new password/i), 'Passw0rd!!');
-    await user.click(screen.getByRole('button', { name: /save new password/i }));
-    await waitFor(() => expect(screen.getByText(/has expired/i)).toBeInTheDocument());
-    expect(screen.getByRole('link', { name: /request a new code/i })).toBeInTheDocument();
+    await user.type(screen.getByLabelText(rxIn('auth.confirmReset.codeLabel')), 'old');
+    await user.type(screen.getByLabelText(rxIn('auth.confirmReset.newPasswordLabel')), 'Passw0rd!!');
+    await user.click(screen.getByRole('button', { name: rx('auth.confirmReset.submit') }));
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        rxIn('errors.auth.confirmReset.VERIFICATION_CODE_EXPIRED.title'),
+      ),
+    );
+    expect(
+      screen.getByRole('link', { name: rx('auth.confirmReset.requestNewCode') }),
+    ).toHaveAttribute('href', '/forgot-password');
   });
 
   it('shows invalid-code alert on VERIFICATION_CODE_INVALID', async () => {
@@ -76,10 +83,14 @@ describe('ConfirmResetPasswordPage', () => {
     });
     renderPage();
     const user = userEvent.setup();
-    await user.type(screen.getByLabelText(/reset code/i), 'bad');
-    await user.type(screen.getByLabelText(/new password/i), 'Passw0rd!!');
-    await user.click(screen.getByRole('button', { name: /save new password/i }));
-    await waitFor(() => expect(screen.getByText(/does not match/i)).toBeInTheDocument());
+    await user.type(screen.getByLabelText(rxIn('auth.confirmReset.codeLabel')), 'bad');
+    await user.type(screen.getByLabelText(rxIn('auth.confirmReset.newPasswordLabel')), 'Passw0rd!!');
+    await user.click(screen.getByRole('button', { name: rx('auth.confirmReset.submit') }));
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        rxIn('errors.auth.confirmReset.VERIFICATION_CODE_INVALID.title'),
+      ),
+    );
   });
 
   it('shows weak-password alert on PASSWORD_DOES_NOT_MEET_POLICY', async () => {
@@ -89,9 +100,13 @@ describe('ConfirmResetPasswordPage', () => {
     });
     renderPage();
     const user = userEvent.setup();
-    await user.type(screen.getByLabelText(/reset code/i), '123456');
-    await user.type(screen.getByLabelText(/new password/i), 'weak');
-    await user.click(screen.getByRole('button', { name: /save new password/i }));
-    await waitFor(() => expect(screen.getByText(/too weak/i)).toBeInTheDocument());
+    await user.type(screen.getByLabelText(rxIn('auth.confirmReset.codeLabel')), '123456');
+    await user.type(screen.getByLabelText(rxIn('auth.confirmReset.newPasswordLabel')), 'weak');
+    await user.click(screen.getByRole('button', { name: rx('auth.confirmReset.submit') }));
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        rxIn('errors.auth.confirmReset.PASSWORD_DOES_NOT_MEET_POLICY.title'),
+      ),
+    );
   });
 });

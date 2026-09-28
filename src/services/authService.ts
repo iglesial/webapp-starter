@@ -11,6 +11,7 @@ import {
   updateUserAttributes,
 } from 'aws-amplify/auth';
 import type { AuthErrorCode, AuthResult, AuthUser } from '../types/auth';
+import { isLocale, type Locale } from '../i18n/locale';
 
 interface AmplifyError {
   name?: string;
@@ -165,6 +166,9 @@ export async function fetchCurrentUser(): Promise<AuthUser | null> {
       email: attrs.email ?? '',
       displayName: attrs.nickname ?? '',
       emailVerified: attrs.email_verified === 'true',
+      // Standard OIDC attribute (no custom: prefix); null until the user
+      // picks a language.
+      locale: isLocale(attrs.locale) ? attrs.locale : null,
       groups,
     };
   } catch {
@@ -175,6 +179,15 @@ export async function fetchCurrentUser(): Promise<AuthUser | null> {
 export async function updateDisplayName(displayName: string): Promise<AuthResult> {
   try {
     await updateUserAttributes({ userAttributes: { nickname: displayName } });
+    return { ok: true, value: undefined };
+  } catch (err) {
+    return { ok: false, ...mapError(err) };
+  }
+}
+
+export async function updateLocale(locale: Locale): Promise<AuthResult> {
+  try {
+    await updateUserAttributes({ userAttributes: { locale } });
     return { ok: true, value: undefined };
   } catch (err) {
     return { ok: false, ...mapError(err) };
