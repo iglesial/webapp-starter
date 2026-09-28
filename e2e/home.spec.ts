@@ -27,3 +27,14 @@ test.describe('language', () => {
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   });
 });
+
+test('the legal pages are reachable from the footer of any page', async ({ page }) => {
+  await page.goto('/signin');
+  const footer = page.getByRole('contentinfo');
+
+  await footer.getByRole('link', { name: 'Legal notice' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Legal notice' })).toBeVisible();
+
+  await footer.getByRole('link', { name: 'Privacy' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Privacy policy' })).toBeVisible();
+});

@@ -6,10 +6,12 @@ import outputs from '../amplify_outputs.json';
 import { AuthProvider } from './contexts/AuthProvider';
 import { LocaleProvider } from './contexts/LocaleProvider';
 import './i18n/config';
+import { initAnalytics } from './analytics';
 import './index.css';
 import App from './App.tsx';
 
 Amplify.configure(outputs);
+initAnalytics();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

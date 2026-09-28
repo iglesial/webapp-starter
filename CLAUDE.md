@@ -30,6 +30,7 @@ src/
 │   ├── layout/             # AppShell (Navbar + Outlet + Footer), LocaleToggle
 │   └── profile/            # DeleteAccountSection
 ├── config/                 # app-level constants (AFTER_SIGN_IN_PATH)
+├── data/legalEntity.ts     # publisher identity, host, processors — fill in before launch
 ├── contexts/               # AuthContext/AuthProvider, LocaleContext/LocaleProvider
 ├── hooks/                  # useAuth, useLocale, useStorageUrl
 ├── i18n/                   # i18next config, locale rules, Intl formatters, typed catalogs
@@ -40,6 +41,7 @@ src/
 ├── types/                  # shared TS types (auth)
 ├── utils/                  # pure helpers (validation, *_ERROR_CODES, awsJson, imageValidation, imageResize)
 ├── test/                   # Vitest setup + i18n test helpers (tt/rx/rxIn)
+├── analytics.ts            # Plausible, on only when VITE_PLAUSIBLE_DOMAIN is set
 ├── designTokens.test.ts    # every var(--x) is defined; filled controls clear WCAG AA
 ├── App.tsx
 ├── main.tsx
@@ -54,6 +56,7 @@ Tests are colocated (`<Name>.test.ts(x)`); there is no top-level `tests/` direct
 - `/signup`, `/confirm`       — sign-up + email confirmation
 - `/signin`                   — sign-in
 - `/forgot-password`, `/forgot-password/confirm` — password reset flow
+- `/legal`, `/privacy`        — public: legal notice, privacy policy (linked from the footer on every page)
 - `/profile`                  — ProtectedRoute: display name, language, sign out, self-service account deletion
 - `/admin`                    — AdminOnlyRoute (renders an Outlet): admin home, nest admin pages under it
 
@@ -122,3 +125,11 @@ The app is **English by default, switchable to French**. To make French the defa
 - **Images are validated then downscaled client-side** to WebP (`validateImageFile` → `uploadService.uploadImage`), which returns the encoded width/height — store them and pass them to `<img>` so the layout does not jump.
 - **Read with `useStorageUrl(key)`**: one signature per key per session, shared by every component, and `null` (render a placeholder) while signing or on failure.
 - **`a.json()` fields and AWSJSON arguments carry a JSON string**, not an object: write with `toAwsJson` and read with `fromAwsJson` (`src/utils/awsJson.ts`).
+
+## Legal pages and analytics
+
+- **`src/data/legalEntity.ts` must be filled in before launch.** Until the required fields are set, `/legal` and `/privacy` show a visible "not configured" banner and a "[contact address not set]" placeholder — a template never passes for a compliant page. Empty optional fields render nothing rather than a guess.
+- **Identity is data, not copy**: names, addresses and registration numbers live in `legalEntity.ts`; only the sentences around them are in the catalogs.
+- **The privacy policy must describe what the app actually does.** Every per-user model, processor or tracker you add means a row in its purposes/retention tables, an entry in `PROCESSORS`, and a matching `legal.*` catalog key — in the same change. Bump `LAST_UPDATED` in `PrivacyPolicyPage.tsx`.
+- **Analytics is Plausible (cookieless) and off unless `VITE_PLAUSIBLE_DOMAIN` is set.** The privacy policy discloses it exactly when it runs. Adding a tracker that sets cookies means a consent banner *before* it loads.
+- `VITE_*` variables are inlined into the public bundle: never put a secret in one.

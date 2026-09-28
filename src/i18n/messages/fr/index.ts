@@ -10,6 +10,7 @@ import { errors } from './errors';
 import { validation } from './validation';
 import { profile } from './profile';
 import { account } from './account';
+import { legal } from './legal';
 import type { en } from '../en';
 
 type Translations<T> = { [K in keyof T]: T[K] extends string ? string : Translations<T[K]> };
@@ -24,4 +25,5 @@ export const fr: Translations<typeof en> = {
   validation,
   profile,
   account,
+  legal,
 };
