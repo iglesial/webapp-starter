@@ -8,6 +8,7 @@ import { Modal } from '../core/Modal';
 import { useAuth } from '../../hooks/useAuth';
 import { accountService } from '../../services/data/accountService';
 import { ACCOUNT_ERROR_KEY } from '../../i18n/serviceErrors';
+import { isPaymentsEnabled } from '../../modules/payments/enabled';
 import './DeleteAccountSection.css';
 
 // Self-service account deletion (GDPR right to erasure). The dialog says what
@@ -65,6 +66,9 @@ export function DeleteAccountSection() {
       <Modal isOpen={open} onClose={closeDialog} title={t('account.dialogTitle')}>
         <div className="delete-account-dialog">
           <p>{t('account.deletedList')}</p>
+          {/* Entitlements are proof of purchase and outlive the account (see
+              ACCOUNT_CLEANUPS). Said before confirming, never discovered after. */}
+          {isPaymentsEnabled() && <p>{t('payments.legal.accountKept')}</p>}
 
           {failed && <Alert type="danger">{t(ACCOUNT_ERROR_KEY.ACCOUNT_DELETE_FAILED)}</Alert>}
 

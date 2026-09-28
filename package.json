@@ -26,6 +26,7 @@
     "react-router-dom": "^7.18.0",
     "remark-directive": "^4.0.0",
     "remark-gfm": "^4.0.1",
+    "stripe": "^22.6.2",
     "unist-util-visit": "^5.1.0"
   },
   "devDependencies": {

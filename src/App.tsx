@@ -13,6 +13,8 @@ import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
 import { ConfirmResetPasswordPage } from './pages/auth/ConfirmResetPasswordPage';
 import { LegalNoticePage } from './pages/LegalNoticePage';
 import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
+import { isPaymentsEnabled } from './modules/payments/enabled';
+import { paymentRoutes } from './modules/payments/routes';
 
 // Lazy-load what most visitors never open, so it stays out of the main
 // bundle: the admin area (only admins download it) and the profile page, which
@@ -65,6 +67,9 @@ function App() {
             }
           />
         </Route>
+
+        {/* Optional module: only while the backend has it switched on. */}
+        {isPaymentsEnabled() && paymentRoutes()}
 
         <Route path="*" element={<main>{t('common.pageNotFound')}</main>} />
       </Route>

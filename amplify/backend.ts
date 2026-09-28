@@ -5,6 +5,10 @@ import { data } from './data/resource.js';
 import { account } from './functions/account/resource.js';
 import { postConfirmation } from './functions/post-confirmation/resource.js';
 import { storage } from './storage/resource.js';
+import { PAYMENTS_ENABLED } from './modules/payments/config.js';
+import { checkout } from './modules/payments/checkout/resource.js';
+import { stripeWebhook } from './modules/payments/webhook/resource.js';
+import { wirePayments, type PaymentsBackend } from './modules/payments/wire.js';
 
 const backend = defineBackend({
   auth,
@@ -16,6 +20,9 @@ const backend = defineBackend({
   // would have nowhere to go.
   postConfirmation,
   storage,
+  // Optional module: its functions exist only when switched on, so their
+  // Stripe secrets are never required otherwise. See modules/payments/config.ts.
+  ...(PAYMENTS_ENABLED ? { checkout, stripeWebhook } : {}),
 });
 
 // Self-service account deletion removes the caller's Cognito user as its LAST
@@ -41,10 +48,25 @@ backend.account.addEnvironment('USER_POOL_ID', backend.auth.resources.userPool.u
 const discordEnv = {
   DISCORD_WEBHOOK_URL: process.env.DISCORD_WEBHOOK_URL ?? '',
   DISCORD_WEBHOOK_URL_SIGNUP: process.env.DISCORD_WEBHOOK_URL_SIGNUP ?? '',
+  DISCORD_WEBHOOK_URL_PURCHASE: process.env.DISCORD_WEBHOOK_URL_PURCHASE ?? '',
 };
 // Set on every notifying function, empty ones included: unset and empty both
 // resolve to silence in notify.ts, and identical environments keep splitting a
 // channel later a console change rather than a code change.
 for (const [name, value] of Object.entries(discordEnv)) {
   backend.postConfirmation.addEnvironment(name, value);
+}
+
+if (PAYMENTS_ENABLED) {
+  // The conditional spread in defineBackend() erases these two handles' types
+  // (Omit<any, …>); PaymentsBackend restores the only members wirePayments
+  // uses. Safe because PAYMENTS_ENABLED is exactly the condition they exist on.
+  wirePayments(
+    {
+      checkout: backend.checkout as unknown as PaymentsBackend['checkout'],
+      stripeWebhook: backend.stripeWebhook as unknown as PaymentsBackend['stripeWebhook'],
+      addOutput: (output) => backend.addOutput(output),
+    },
+    discordEnv,
+  );
 }

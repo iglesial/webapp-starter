@@ -52,6 +52,9 @@ export interface AccountCleanup {
 // Order matters when rows reference each other: delete children before the
 // row they point to, so a failure part-way leaves a parent with no children
 // rather than orphans nothing can reach.
+// Deliberately NOT listed: the payments module's Entitlement rows. They are
+// proof of purchase (accounting, chargebacks), hold only the pseudonymous sub,
+// and the deletion dialog says they are kept.
 export const ACCOUNT_CLEANUPS: AccountCleanup[] = [];
 
 // Runs every cleanup in order and reports what each removed. Stops at the

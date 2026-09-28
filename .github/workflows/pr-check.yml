@@ -28,3 +28,10 @@ jobs:
       # stack circular dependencies, malformed schedules and invalid policies
       # that typecheck and unit tests cannot see.
       - run: npm run synth
+
+      # Optional modules are off by default, so the line above never builds
+      # them. Synthesize with each switched on too, or they rot unnoticed.
+      - name: synth (payments module on)
+        run: npm run synth
+        env:
+          PAYMENTS_ENABLED: 'true'

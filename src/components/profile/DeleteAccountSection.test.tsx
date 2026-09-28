@@ -12,6 +12,9 @@ vi.mock('../../services/data/accountService', () => ({
   accountService: { deleteMyAccount: vi.fn() },
 }));
 
+const payments = vi.hoisted(() => ({ enabled: false }));
+vi.mock('../../modules/payments/enabled', () => ({ isPaymentsEnabled: () => payments.enabled }));
+
 const deleteMock = vi.mocked(accountService.deleteMyAccount);
 
 const alice: AuthUser = {
@@ -56,6 +59,7 @@ function renderSection(signOut = vi.fn(async () => {})) {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  payments.enabled = false;
 });
 
 async function confirmAndSubmit(user: ReturnType<typeof userEvent.setup>) {
@@ -114,5 +118,23 @@ describe('DeleteAccountSection', () => {
     expect(screen.queryByText('boom')).not.toBeInTheDocument();
     expect(signOut).not.toHaveBeenCalled();
     expect(screen.queryByTestId('landed')).not.toBeInTheDocument();
+  });
+});
+
+// What is KEPT must be said before confirming, never discovered after.
+describe('DeleteAccountSection — with payments on', () => {
+  it('says proof of purchase is kept, only while payments are on', async () => {
+    const user = userEvent.setup();
+    renderSection();
+    await user.click(screen.getByRole('button', { name: rx('account.open') }));
+    expect(screen.queryByText(tt('payments.legal.accountKept'))).toBeNull();
+  });
+
+  it('shows the kept-purchases line when on', async () => {
+    payments.enabled = true;
+    const user = userEvent.setup();
+    renderSection();
+    await user.click(screen.getByRole('button', { name: rx('account.open') }));
+    expect(screen.getByText(tt('payments.legal.accountKept'))).toBeInTheDocument();
   });
 });

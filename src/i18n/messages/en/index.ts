@@ -16,6 +16,8 @@ import { account } from './account';
 import { legal } from './legal';
 // Optional module — see src/modules/markdown/README.md.
 import { markdown } from './markdown';
+// Optional module — see src/modules/payments/README.md.
+import { payments } from './payments';
 
 export const en = {
   common,
@@ -29,4 +31,5 @@ export const en = {
   account,
   legal,
   markdown,
+  payments,
 } as const;
