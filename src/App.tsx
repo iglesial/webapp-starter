@@ -11,6 +11,8 @@ import { ConfirmSignUpPage } from './pages/auth/ConfirmSignUpPage';
 import { SignInPage } from './pages/auth/SignInPage';
 import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
 import { ConfirmResetPasswordPage } from './pages/auth/ConfirmResetPasswordPage';
+import { LegalNoticePage } from './pages/LegalNoticePage';
+import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
 
 // Lazy-load what most visitors never open, so it stays out of the main
 // bundle: the admin area (only admins download it) and the profile page, which
@@ -37,6 +39,8 @@ function App() {
         <Route path="/signin" element={<SignInPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/forgot-password/confirm" element={<ConfirmResetPasswordPage />} />
+        <Route path="/legal" element={<LegalNoticePage />} />
+        <Route path="/privacy" element={<PrivacyPolicyPage />} />
 
         <Route
           path="/profile"

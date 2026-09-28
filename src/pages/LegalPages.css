@@ -1,0 +1,104 @@
+.legal-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+  text-align: left;
+  line-height: 1.7;
+}
+
+.legal-page h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.legal-page h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 2.5rem 0 0.75rem;
+}
+
+.legal-page a {
+  color: var(--accent);
+}
+
+.legal-updated {
+  color: var(--text);
+  font-size: 0.875rem;
+  margin: 0 0 2rem;
+}
+
+/* The section a reader actually reads, so it is set apart rather than
+   buried between headings. */
+.legal-summary {
+  background: var(--accent-bg);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 1rem 1.5rem;
+}
+
+.legal-summary h2 {
+  margin-top: 0.5rem;
+}
+
+.legal-facts {
+  margin: 0;
+}
+
+.legal-fact {
+  display: grid;
+  grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+  gap: 0.5rem 1.5rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.legal-fact dt {
+  color: var(--text);
+  font-size: 0.9375rem;
+}
+
+.legal-fact dd {
+  margin: 0;
+}
+
+.legal-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.legal-table th,
+.legal-table td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.legal-table th {
+  background: var(--code-bg);
+  font-weight: 600;
+}
+
+.legal-processors {
+  padding-left: 1.25rem;
+}
+
+.legal-processors li {
+  margin-bottom: 0.35rem;
+}
+
+/* Tables of purposes and retention do not fit a phone; let them scroll
+   rather than forcing the page to. */
+@media (max-width: 640px) {
+  .legal-fact {
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
+  }
+
+  .legal-table {
+    display: block;
+    overflow-x: auto;
+  }
+}

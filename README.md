@@ -24,6 +24,8 @@ The sandbox writes `amplify_outputs.json` into the repo root; `src/main.tsx` rea
 - Self-service account deletion from `/profile`: an explicit confirmation, then a Lambda that deletes per-user data and the Cognito user last (extend `ACCOUNT_CLEANUPS` as you add per-user models)
 - Cognito post-confirmation trigger posting “new signup” to Discord when `DISCORD_WEBHOOK_URL` is set (silent otherwise; no personal data)
 - S3 storage with audience-by-prefix access (`public/*` for everyone, `members/*` for signed-in users, admin-only writes), a client-side resize-to-WebP upload service, and a cached signed-URL hook
+- Legal notice (`/legal`) and privacy policy (`/privacy`) templates driven by `src/data/legalEntity.ts`, flagged as "not configured" until you fill it in
+- Optional cookieless analytics (Plausible) via `VITE_PLAUSIBLE_DOMAIN`
 - Admin home at `/admin` (card grid; nest your admin pages under it), lazy-loaded
 - i18n with `react-i18next`: English by default, French included, typed catalogs (a missing translation is a compile error), language saved to the Cognito account, `Intl` price/date formatters. Flip `DEFAULT_LOCALE` in `src/i18n/locale.ts` to change the default.
 - `HealthCheck` data model in `amplify/data/resource.ts` as a wiring example — replace with your own models
@@ -36,6 +38,7 @@ The sandbox writes `amplify_outputs.json` into the repo root; `src/main.tsx` rea
 | `/signup`, `/confirm` | public | Sign-up + email verification |
 | `/signin` | public | Sign-in |
 | `/forgot-password`, `/forgot-password/confirm` | public | Password reset |
+| `/legal`, `/privacy` | public | Legal notice, privacy policy |
 | `/profile` | authenticated | Display name + sign out |
 | `/admin` | admin group | Admin home — nest admin pages under it |
 
@@ -61,6 +64,7 @@ Set these as **branch environment variables** in the Amplify console (they are r
 |----------|--------|
 | `DISCORD_WEBHOOK_URL` | Posts operator notifications (currently: new sign-ups) to this Discord channel. Unset = silent. |
 | `DISCORD_WEBHOOK_URL_SIGNUP` | Sends sign-up notifications to a different channel than the shared one. |
+| `VITE_PLAUSIBLE_DOMAIN` | Turns on Plausible analytics for this domain (e.g. `example.com`). Unset = no analytics, and the privacy policy says nothing about it. |
 
 The webhook URL is a credential — anyone holding it can post to the channel. It is never logged; rotate it by deleting the webhook in Discord.
 
@@ -69,6 +73,7 @@ The webhook URL is a credential — anyone holding it can post to the channel. I
 1. Rename `"webapp-starter"` in `package.json`.
 2. Update `<title>` in `index.html`.
 3. Edit `amplify/data/resource.ts` — add your data models (keep or replace `HealthCheck`).
-4. Set `common.appName` in `src/i18n/messages/{en,fr}/common.ts`, replace `src/assets/logo.svg`, and adjust the palette in `src/index.css` (the contrast test tells you if a button becomes unreadable).
-5. Rewrite `src/pages/HomePage.tsx` for your app's landing content.
-6. Rewrite `CLAUDE.md` and this `README.md` for your project.
+4. Fill in `src/data/legalEntity.ts` (publisher, contact email, host region, processors) and review the privacy policy copy in `src/i18n/messages/*/legal.ts` — it is a starting point, not legal advice.
+5. Set `common.appName` in `src/i18n/messages/{en,fr}/common.ts`, replace `src/assets/logo.svg`, and adjust the palette in `src/index.css` (the contrast test tells you if a button becomes unreadable).
+6. Rewrite `src/pages/HomePage.tsx` for your app's landing content.
+7. Rewrite `CLAUDE.md` and this `README.md` for your project.
