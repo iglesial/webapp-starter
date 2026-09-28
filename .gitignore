@@ -23,6 +23,8 @@ awsconfiguration.json
 
 # Tests
 coverage/
+test-results/
+playwright-report/
 
 # Editor directories and files
 .vscode/*
@@ -34,3 +36,6 @@ coverage/
 *.njsproj
 *.sln
 *.sw?
+
+# Local `npm run synth` output — a build artefact, never committed.
+cdk.out/

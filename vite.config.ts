@@ -9,5 +9,6 @@ export default defineConfig({
     globals: false,
     setupFiles: ['./src/test/setup.ts'],
     css: true,
+    exclude: ['**/node_modules/**', 'e2e/**', '.claude/worktrees/**'],
   },
 });

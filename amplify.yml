@@ -1,0 +1,26 @@
+version: 1
+backend:
+  phases:
+    build:
+      commands:
+        - nvm use 22
+        # npm install (not npm ci): platform-specific optional packages and
+        # dependency bumps have repeatedly produced lock files that pass
+        # locally but fail npm ci's strict sync check on Amplify's Linux
+        # builders. npm install tolerates that drift; CI's pr-check still
+        # runs the strict gates.
+        - npm install --cache .npm --prefer-offline
+        - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
+frontend:
+  phases:
+    build:
+      commands:
+        - nvm use 22
+        - npm run build
+  artifacts:
+    baseDirectory: dist
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - .npm/**/*

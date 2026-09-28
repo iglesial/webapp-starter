@@ -1,0 +1,30 @@
+name: PR Check
+
+on:
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm install
+
+      - run: npm run typecheck
+
+      - run: npm run lint
+
+      - run: npm run test:run
+
+      # Synthesizes the Amplify backend locally (no AWS call). Catches nested-
+      # stack circular dependencies, malformed schedules and invalid policies
+      # that typecheck and unit tests cannot see.
+      - run: npm run synth
