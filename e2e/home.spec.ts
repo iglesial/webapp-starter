@@ -44,3 +44,15 @@ test('checkout routes do not exist while payments are off', async ({ page }) => 
   await page.goto('/checkout/pro');
   await expect(page.getByText('Page not found.')).toBeVisible();
 });
+
+test('presentations open full-screen, outside the app shell', async ({ page }) => {
+  await page.goto('/presentations');
+  await page.getByRole('link', { name: /example deck/i }).click();
+
+  await expect(page.getByRole('region', { name: 'Building a deck' })).toBeVisible();
+  // No navbar or footer around a deck.
+  await expect(page.getByRole('contentinfo')).toHaveCount(0);
+
+  await page.keyboard.press('ArrowRight');
+  await expect(page.getByText('2 / 3')).toBeVisible();
+});

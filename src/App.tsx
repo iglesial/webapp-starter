@@ -15,6 +15,7 @@ import { LegalNoticePage } from './pages/LegalNoticePage';
 import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
 import { isPaymentsEnabled } from './modules/payments/enabled';
 import { paymentRoutes } from './modules/payments/routes';
+import { presentationRoutes } from './modules/presentations/routes';
 
 // Lazy-load what most visitors never open, so it stays out of the main
 // bundle: the admin area (only admins download it) and the profile page, which
@@ -32,6 +33,9 @@ function App() {
 
   return (
     <Routes>
+      {/* Optional module, full-screen: outside the shell on purpose. */}
+      {presentationRoutes()}
+
       {/* Every page renders inside the shell (navbar + footer). A route that
           must be full-screen (a slide deck, a kiosk view) goes outside it. */}
       <Route element={<AppShell />}>
