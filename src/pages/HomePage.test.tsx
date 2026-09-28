@@ -41,18 +41,4 @@ describe('HomePage', () => {
     await user.click(screen.getByRole('button', { name: rx('home.signIn') }));
     expect(screen.getByTestId('landed-at')).toHaveTextContent('/signin');
   });
-
-  it('renders a header landmark with the brand mark and a language switch', () => {
-    renderHome();
-    const banner = screen.getByRole('banner');
-    expect(banner).toHaveTextContent(tt('home.brand'));
-    expect(screen.getByRole('group', { name: rx('nav.language') })).toBeInTheDocument();
-  });
-
-  it('renders a footer with two placeholder legal links', () => {
-    renderHome();
-    expect(screen.getByRole('contentinfo')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: rx('home.terms') })).toHaveAttribute('href', '#terms');
-    expect(screen.getByRole('link', { name: rx('home.privacy') })).toHaveAttribute('href', '#privacy');
-  });
 });

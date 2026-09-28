@@ -1,5 +1,9 @@
 export const common = {
+  // The product name. Rendered in the navbar, footer and landing page.
+  appName: 'Webapp Starter',
+  copyright: '© {{appName}}',
   close: 'Close',
+  dismiss: 'Dismiss',
   cancel: 'Cancel',
   save: 'Save',
   saving: 'Saving…',

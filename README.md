@@ -18,7 +18,10 @@ The sandbox writes `amplify_outputs.json` into the repo root; `src/main.tsx` rea
 - `AuthContext` / `useAuth` / `authService` around `aws-amplify/auth` (Hub-driven)
 - `ProtectedRoute` and `AdminOnlyRoute` guards
 - Hand-rolled auth pages in `src/pages/auth/` — no `@aws-amplify/ui-react` form components
-- Core UI primitives in `src/components/core/` (Alert, Badge, Button, Card, FormField, Hero, Input, Modal, ProgressBar, Select, Spinner, Textarea) with colocated tests
+- Core UI primitives in `src/components/core/` (Alert, Badge, Button, Card, Checkbox, FileInput, FormField, Hero, Input, Modal, ProgressBar, Select, Spinner, Switch, Textarea, Toast) with colocated tests — see its README
+- `AppShell` layout: responsive navbar (hamburger under 1024px, language toggle, auth-aware links) and footer on every page
+- Light and dark themes from design tokens in `src/index.css`, with a test that fails on undefined tokens or low-contrast buttons
+- Admin home at `/admin` (card grid; nest your admin pages under it), lazy-loaded
 - i18n with `react-i18next`: English by default, French included, typed catalogs (a missing translation is a compile error), language saved to the Cognito account, `Intl` price/date formatters. Flip `DEFAULT_LOCALE` in `src/i18n/locale.ts` to change the default.
 - `HealthCheck` data model in `amplify/data/resource.ts` as a wiring example — replace with your own models
 
@@ -31,7 +34,7 @@ The sandbox writes `amplify_outputs.json` into the repo root; `src/main.tsx` rea
 | `/signin` | public | Sign-in |
 | `/forgot-password`, `/forgot-password/confirm` | public | Password reset |
 | `/profile` | authenticated | Display name + sign out |
-| `/admin` | admin group | Example admin area |
+| `/admin` | admin group | Admin home — nest admin pages under it |
 
 ## Scripts
 
@@ -52,5 +55,6 @@ CI (`.github/workflows/pr-check.yml`) runs typecheck, lint, unit tests and synth
 1. Rename `"webapp-starter"` in `package.json`.
 2. Update `<title>` in `index.html`.
 3. Edit `amplify/data/resource.ts` — add your data models (keep or replace `HealthCheck`).
-4. Rewrite `src/pages/HomePage.tsx` for your app's landing content.
-5. Rewrite `CLAUDE.md` and this `README.md` for your project.
+4. Set `common.appName` in `src/i18n/messages/{en,fr}/common.ts`, replace `src/assets/logo.svg`, and adjust the palette in `src/index.css` (the contrast test tells you if a button becomes unreadable).
+5. Rewrite `src/pages/HomePage.tsx` for your app's landing content.
+6. Rewrite `CLAUDE.md` and this `README.md` for your project.

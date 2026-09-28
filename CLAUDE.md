@@ -22,16 +22,17 @@ src/
 ├── components/
 │   ├── core/               # reusable primitives (colocated CSS + tests)
 │   ├── auth/               # ProtectedRoute, AdminOnlyRoute guards
-│   └── layout/             # LocaleToggle
+│   └── layout/             # AppShell (Navbar + Outlet + Footer), LocaleToggle
 ├── config/                 # app-level constants (AFTER_SIGN_IN_PATH)
 ├── contexts/               # AuthContext/AuthProvider, LocaleContext/LocaleProvider
 ├── hooks/                  # useAuth, useLocale
 ├── i18n/                   # i18next config, locale rules, Intl formatters, typed catalogs
-├── pages/                  # HomePage, ProfilePage, auth/*
+├── pages/                  # HomePage, ProfilePage, auth/*, admin/* (English-only)
 ├── services/               # authService (Amplify wrapper)
 ├── types/                  # shared TS types (auth)
 ├── utils/                  # pure helpers (validation)
 ├── test/                   # Vitest setup + i18n test helpers (tt/rx/rxIn)
+├── designTokens.test.ts    # every var(--x) is defined; filled controls clear WCAG AA
 ├── App.tsx
 ├── main.tsx
 └── index.css               # design tokens in :root
@@ -46,7 +47,9 @@ Tests are colocated (`<Name>.test.ts(x)`); there is no top-level `tests/` direct
 - `/signin`                   — sign-in
 - `/forgot-password`, `/forgot-password/confirm` — password reset flow
 - `/profile`                  — ProtectedRoute: display name, language, sign out
-- `/admin`                    — AdminOnlyRoute: example admin area
+- `/admin`                    — AdminOnlyRoute (renders an Outlet): admin home, nest admin pages under it
+
+Every route renders inside `AppShell` (navbar + footer) via a layout route in `App.tsx`. Heavy or rarely-visited pages are `React.lazy` + `Suspense` (the admin area is the example).
 
 ## Commands
 
@@ -71,6 +74,9 @@ Tests are colocated (`<Name>.test.ts(x)`); there is no top-level `tests/` direct
 - Forms are hand-rolled on `src/components/core/` (Input, FormField, Button, etc.) — do NOT pull in `@aws-amplify/ui-react` form components.
 - Tests colocated alongside sources as `*.test.ts(x)`.
 - Route guards live in `src/components/auth/` and rely on `useAuth()` for status + admin group membership.
+- **Design tokens**: colours, radii and shadows come from custom properties in `src/index.css`, overridden under `prefers-color-scheme: dark`. An undefined `var(--x)` fails silently and paints nothing, so `designTokens.test.ts` fails on any token used without a fallback that is never defined. Text on a filled control uses its `--on-*` token (`--on-primary`, `--on-danger`), never a hardcoded `white` — the test checks each pair clears 4.5:1 in both themes.
+- **Never nest a `<Button>` inside a `<Link>`** (invalid HTML, announced as two controls). For a link that looks like a button, put the `btn btn-<variant> btn-<size>` classes on the `<Link>`.
+- **The admin back-office stays English** (`src/pages/admin/`, `src/components/admin/`): no `useTranslation()` there. It is an internal tool, and translating it doubles the catalog for no user.
 
 ## Internationalization
 

@@ -1,0 +1,73 @@
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.switch:hover {
+  color: var(--text-h);
+}
+
+.switch[aria-checked='true'] {
+  color: var(--text-h);
+}
+
+.switch-track {
+  position: relative;
+  flex-shrink: 0;
+  width: 2.125rem;
+  height: 1.25rem;
+  border-radius: 99px;
+  /* --track is the same groove colour the progress bar uses, so every "empty
+     rail" in the product is one colour rather than several near-misses. */
+  background: var(--track);
+  transition: background 0.15s ease;
+}
+
+.switch[aria-checked='true'] .switch-track {
+  background: var(--accent);
+}
+
+.switch-knob {
+  position: absolute;
+  top: 0.1875rem;
+  left: 0.1875rem;
+  width: 0.875rem;
+  height: 0.875rem;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s ease;
+}
+
+.switch[aria-checked='true'] .switch-knob {
+  transform: translateX(0.875rem);
+}
+
+/* The focus ring goes on the track rather than the whole control, so it reads
+   as "this switch is focused" rather than outlining the label text too. */
+.switch:focus-visible {
+  outline: none;
+}
+
+.switch:focus-visible .switch-track {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switch-track,
+  .switch-knob {
+    transition: none;
+  }
+}

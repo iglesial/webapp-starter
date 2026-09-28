@@ -1,0 +1,45 @@
+.file-input {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Visually hidden, not display:none — a hidden input is unfocusable, which
+   would make the control keyboard-inaccessible. */
+.file-input-native {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.file-input-label {
+  display: inline-block;
+  background: transparent;
+  border: 1px solid var(--border, #e5e5e5);
+  color: var(--text-h, #0a0a0a);
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius, 8px);
+  cursor: pointer;
+}
+
+.file-input-label:hover,
+/* The hidden input takes focus, so the ring has to be drawn on the label. */
+.file-input-native:focus-visible + .file-input-label {
+  border-color: var(--accent, #f26522);
+  color: var(--accent, #f26522);
+}
+
+.file-input-native:disabled + .file-input-label {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.file-input-hint {
+  color: var(--text, #555);
+  font-size: 0.9375rem;
+}

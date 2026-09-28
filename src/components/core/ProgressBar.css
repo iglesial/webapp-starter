@@ -1,6 +1,9 @@
 .progress-bar {
   width: 100%;
-  background: var(--bg-main);
+  /* --track, not --bg-main: that alias is white, so on a white card the
+     unfilled part of the bar was invisible and an empty bar looked like a
+     stray dot floating in space rather than a bar with nothing in it. */
+  background: var(--track);
   border-radius: 99px;
   overflow: hidden;
 }
@@ -10,16 +13,22 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding-right: 0.5rem;
   transition: width 0.3s ease;
   border-radius: 99px;
 }
 
+/* No padding on the fill. It used to carry padding-right to inset the %
+   label, and with the default content-box that padding still occupied 8px at
+   width: 0% — a rounded, coloured, 8px-wide box, which is exactly the dot.
+   box-sizing would not have fixed it either: padding is never reduced below
+   its declared value. The inset belongs to the label instead, so a 0% fill is
+   genuinely zero wide. */
 .progress-bar-label {
   font-size: 0.75rem;
   font-weight: 600;
   color: white;
   white-space: nowrap;
+  margin-right: 0.5rem;
 }
 
 /* Sizes */
@@ -54,4 +63,18 @@
 
 .progress-bar-danger {
   background: var(--danger);
+}
+
+/* A started-but-barely track should look started. Without this, one module of
+   twenty is 5% — a sliver a few pixels wide that reads as nothing. The
+   modifier is applied only when the value is above zero, so genuinely empty
+   stays genuinely empty. */
+.progress-bar-fill-started {
+  min-width: 0.75rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-bar-fill {
+    transition: none;
+  }
 }

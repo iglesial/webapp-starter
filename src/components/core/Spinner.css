@@ -5,6 +5,12 @@
   display: inline-block;
 }
 
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .spinner-sr-only {
   position: absolute;
   width: 1px;

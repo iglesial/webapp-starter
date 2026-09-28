@@ -1,0 +1,41 @@
+/* margin-top: auto pins the footer to the bottom of short pages — .app-shell
+   is a flex column with min-height: 100svh. */
+.site-footer {
+  margin-top: auto;
+  padding: 2rem 1.5rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.875rem;
+}
+
+.site-footer-copy {
+  margin: 0;
+  color: var(--text);
+}
+
+.site-footer-links {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.site-footer-link {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.site-footer-link:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* Hidden during an active exam: the exam takes the whole viewport in
+   fullscreen, and a footer under it is noise the candidate cannot use. */
+.exam-page-active ~ .site-footer,
+body:fullscreen .site-footer {
+  display: none;
+}
