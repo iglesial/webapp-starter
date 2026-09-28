@@ -20,6 +20,7 @@ amplify/
 │   ├── account/            # deleteMyAccount: per-user data cascade, then the Cognito user LAST
 │   ├── post-confirmation/  # Cognito trigger: Discord “new signup” (never throws)
 │   └── shared/             # appsync (identityOf, throwOnErrors, collectAll), dataClient, notify
+├── storage/resource.ts     # defineStorage: public/* (guest read), members/* (signed-in read); admin write
 └── backend.ts              # defineBackend composition, scoped IAM grants, branch env vars
 
 src/
@@ -30,13 +31,14 @@ src/
 │   └── profile/            # DeleteAccountSection
 ├── config/                 # app-level constants (AFTER_SIGN_IN_PATH)
 ├── contexts/               # AuthContext/AuthProvider, LocaleContext/LocaleProvider
-├── hooks/                  # useAuth, useLocale
+├── hooks/                  # useAuth, useLocale, useStorageUrl
 ├── i18n/                   # i18next config, locale rules, Intl formatters, typed catalogs
 ├── pages/                  # HomePage, ProfilePage, auth/*, admin/* (English-only)
 ├── services/               # authService (Amplify wrapper)
+│   ├── uploadService.ts    # resize → WebP → upload under a STORAGE_PREFIX
 │   └── data/               # shared dataClient + accountService
 ├── types/                  # shared TS types (auth)
-├── utils/                  # pure helpers (validation, *_ERROR_CODES)
+├── utils/                  # pure helpers (validation, *_ERROR_CODES, awsJson, imageValidation, imageResize)
 ├── test/                   # Vitest setup + i18n test helpers (tt/rx/rxIn)
 ├── designTokens.test.ts    # every var(--x) is defined; filled controls clear WCAG AA
 ├── App.tsx
@@ -110,3 +112,13 @@ The app is **English by default, switchable to French**. To make French the defa
 `/profile` → `deleteMyAccount` → `amplify/functions/account/`. The handler runs `ACCOUNT_CLEANUPS` in order, then deletes the Cognito user **last**, so a failure part-way leaves an account the user can still sign into and retry — never data nobody can reach. It is safe to re-run.
 
 **Every model that stores per-user data needs an entry in `ACCOUNT_CLEANUPS`** (`deleteAccountData.ts` has a worked example); `deleteAccountData.test.ts` fails the day the list stops being empty, as a reminder to check it deletes everything. If your app must keep something after deletion, say so in `account.deletedList` before the user confirms.
+
+## Storage and files
+
+- **Access is decided by the key prefix**, in `amplify/storage/resource.ts`: `public/*` is readable by anyone including guests, `members/*` by signed-in users only, and only the `admin` group writes either. Choose the audience by choosing the prefix (`STORAGE_PREFIX` in `src/services/uploadService.ts`); a test fails if the two files drift.
+- **Never put user content or anything private under `public/`.** Anyone holding the key can read it.
+- **No per-user prefix exists yet, on purpose**: account deletion would also have to delete that user's objects. Add both together (see the note in the storage resource).
+- **Uploads get a fresh, timestamped key** (`imagePath`), never a fixed one, so replacing a file cannot leave cached signed URLs pointing at a half-written object. Delete the old key with `removeQuietly` only when nothing else references it.
+- **Images are validated then downscaled client-side** to WebP (`validateImageFile` → `uploadService.uploadImage`), which returns the encoded width/height — store them and pass them to `<img>` so the layout does not jump.
+- **Read with `useStorageUrl(key)`**: one signature per key per session, shared by every component, and `null` (render a placeholder) while signing or on failure.
+- **`a.json()` fields and AWSJSON arguments carry a JSON string**, not an object: write with `toAwsJson` and read with `fromAwsJson` (`src/utils/awsJson.ts`).

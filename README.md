@@ -23,6 +23,7 @@ The sandbox writes `amplify_outputs.json` into the repo root; `src/main.tsx` rea
 - Light and dark themes from design tokens in `src/index.css`, with a test that fails on undefined tokens or low-contrast buttons
 - Self-service account deletion from `/profile`: an explicit confirmation, then a Lambda that deletes per-user data and the Cognito user last (extend `ACCOUNT_CLEANUPS` as you add per-user models)
 - Cognito post-confirmation trigger posting “new signup” to Discord when `DISCORD_WEBHOOK_URL` is set (silent otherwise; no personal data)
+- S3 storage with audience-by-prefix access (`public/*` for everyone, `members/*` for signed-in users, admin-only writes), a client-side resize-to-WebP upload service, and a cached signed-URL hook
 - Admin home at `/admin` (card grid; nest your admin pages under it), lazy-loaded
 - i18n with `react-i18next`: English by default, French included, typed catalogs (a missing translation is a compile error), language saved to the Cognito account, `Intl` price/date formatters. Flip `DEFAULT_LOCALE` in `src/i18n/locale.ts` to change the default.
 - `HealthCheck` data model in `amplify/data/resource.ts` as a wiring example — replace with your own models
