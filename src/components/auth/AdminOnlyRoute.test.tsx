@@ -5,6 +5,7 @@ import { AdminOnlyRoute } from './AdminOnlyRoute';
 import { AuthProvider } from '../../contexts/AuthProvider';
 import * as authService from '../../services/authService';
 import type { AuthUser } from '../../types/auth';
+import { rxIn } from '../../test/i18n';
 
 vi.mock('aws-amplify/utils', () => ({
   Hub: { listen: vi.fn(() => () => {}) },
@@ -20,6 +21,7 @@ const adminUser: AuthUser = {
   email: 'admin@example.com',
   displayName: 'Admin',
   emailVerified: true,
+  locale: null,
   groups: ['admin'],
 };
 
@@ -60,7 +62,7 @@ describe('AdminOnlyRoute', () => {
     vi.mocked(authService.fetchCurrentUser).mockResolvedValue(regularUser);
     renderAt('/admin/stories');
     await waitFor(() =>
-      expect(screen.getByRole('alert')).toHaveTextContent(/admin access required/i),
+      expect(screen.getByRole('alert')).toHaveTextContent(rxIn('adminGate.title')),
     );
     expect(screen.queryByTestId('admin-content')).not.toBeInTheDocument();
   });

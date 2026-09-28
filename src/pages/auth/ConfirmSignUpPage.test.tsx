@@ -6,6 +6,7 @@ import {
   confirmSignUpWithCode,
   resendConfirmationCode,
 } from '../../services/authService';
+import { rx, rxIn } from '../../test/i18n';
 import { ConfirmSignUpPage } from './ConfirmSignUpPage';
 
 vi.mock('../../services/authService', () => ({
@@ -57,8 +58,8 @@ describe('ConfirmSignUpPage', () => {
     vi.mocked(confirmSignUpWithCode).mockResolvedValue({ ok: true, value: undefined });
     renderPage();
     const user = userEvent.setup();
-    await user.type(screen.getByLabelText(/verification code/i), '123456');
-    await user.click(screen.getByRole('button', { name: /confirm account/i }));
+    await user.type(screen.getByLabelText(rxIn('auth.confirmSignUp.codeLabel')), '123456');
+    await user.click(screen.getByRole('button', { name: rx('auth.confirmSignUp.submit') }));
     await waitFor(() =>
       expect(screen.getByTestId('landed')).toHaveTextContent('/signin|a@b.co'),
     );
@@ -72,9 +73,13 @@ describe('ConfirmSignUpPage', () => {
     });
     renderPage();
     const user = userEvent.setup();
-    await user.type(screen.getByLabelText(/verification code/i), 'wrong');
-    await user.click(screen.getByRole('button', { name: /confirm account/i }));
-    await waitFor(() => expect(screen.getByText(/does not match/i)).toBeInTheDocument());
+    await user.type(screen.getByLabelText(rxIn('auth.confirmSignUp.codeLabel')), 'wrong');
+    await user.click(screen.getByRole('button', { name: rx('auth.confirmSignUp.submit') }));
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        rxIn('errors.auth.confirmSignUp.VERIFICATION_CODE_INVALID.title'),
+      ),
+    );
   });
 
   it('shows an expired-code alert on VERIFICATION_CODE_EXPIRED', async () => {
@@ -84,17 +89,25 @@ describe('ConfirmSignUpPage', () => {
     });
     renderPage();
     const user = userEvent.setup();
-    await user.type(screen.getByLabelText(/verification code/i), 'old');
-    await user.click(screen.getByRole('button', { name: /confirm account/i }));
-    await waitFor(() => expect(screen.getByText(/expired/i)).toBeInTheDocument());
+    await user.type(screen.getByLabelText(rxIn('auth.confirmSignUp.codeLabel')), 'old');
+    await user.click(screen.getByRole('button', { name: rx('auth.confirmSignUp.submit') }));
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        rxIn('errors.auth.confirmSignUp.VERIFICATION_CODE_EXPIRED.title'),
+      ),
+    );
   });
 
   it('calls resendConfirmationCode and shows a success alert on resend', async () => {
     vi.mocked(resendConfirmationCode).mockResolvedValue({ ok: true, value: undefined });
     renderPage();
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: /resend code/i }));
-    await waitFor(() => expect(screen.getByText(/new code is on its way/i)).toBeInTheDocument());
+    await user.click(screen.getByRole('button', { name: rx('auth.confirmSignUp.resend') }));
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        rxIn('auth.confirmSignUp.resentBody'),
+      ),
+    );
     expect(resendConfirmationCode).toHaveBeenCalledWith('a@b.co');
   });
 });

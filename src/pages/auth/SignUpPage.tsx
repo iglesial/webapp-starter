@@ -1,50 +1,27 @@
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Alert } from '../../components/core/Alert';
 import { Button } from '../../components/core/Button';
 import { FormField } from '../../components/core/FormField';
 import { Input } from '../../components/core/Input';
 import { Spinner } from '../../components/core/Spinner';
+import { AFTER_SIGN_IN_PATH } from '../../config/routes';
 import { useAuth } from '../../hooks/useAuth';
 import { signUpWithDisplayName } from '../../services/authService';
 import { isAuthFailure, type AuthErrorCode } from '../../types/auth';
 import {
-  displayNameErrorMessage,
+  displayNameErrorKey,
+  DISPLAY_NAME_LIMITS,
   isDisplayNameInvalid,
   validateDisplayName,
 } from '../../utils/validation';
+import { authErrorCopy } from '../../i18n/authErrors';
 import './authShared.css';
 import './SignUpPage.css';
 
-const PASSWORD_HINT =
-  'At least 10 characters, with upper- and lower-case letters and a number.';
-
-function topErrorCopy(code: AuthErrorCode): { title: string; body: string } {
-  switch (code) {
-    case 'EMAIL_ALREADY_REGISTERED':
-      return {
-        title: 'That email is already registered.',
-        body: 'Try signing in, or reset your password if you forgot it.',
-      };
-    case 'PASSWORD_DOES_NOT_MEET_POLICY':
-      return {
-        title: 'Password is too weak.',
-        body: PASSWORD_HINT,
-      };
-    case 'RATE_LIMITED_TRY_LATER':
-      return {
-        title: 'Too many attempts.',
-        body: 'Please wait a moment and try again.',
-      };
-    default:
-      return {
-        title: 'We could not create your account.',
-        body: 'Please check your details and try again.',
-      };
-  }
-}
-
 export function SignUpPage() {
+  const { t } = useTranslation();
   const { status } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -55,7 +32,7 @@ export function SignUpPage() {
   const [submitting, setSubmitting] = useState(false);
 
   if (status === 'authenticated') {
-    return <Navigate to="/library" replace />;
+    return <Navigate to={AFTER_SIGN_IN_PATH} replace />;
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -64,7 +41,7 @@ export function SignUpPage() {
 
     const nameCheck = validateDisplayName(displayName);
     if (isDisplayNameInvalid(nameCheck)) {
-      setDisplayNameError(displayNameErrorMessage(nameCheck.reason));
+      setDisplayNameError(t(displayNameErrorKey(nameCheck.reason), DISPLAY_NAME_LIMITS));
       return;
     }
     setDisplayNameError(undefined);
@@ -84,33 +61,31 @@ export function SignUpPage() {
     navigate('/confirm', { state: { email: email.trim() } });
   }
 
-  const topCopy = topError ? topErrorCopy(topError) : null;
+  const topCopy = topError ? authErrorCopy('signUp', topError) : null;
 
   return (
     <div className="auth-page signup-page">
       <header>
-        <h1 className="auth-page-title">Create your account</h1>
-        <p className="auth-page-subtitle">
-          Pick a display name — it's the name other users will see.
-        </p>
+        <h1 className="auth-page-title">{t('auth.signUp.title')}</h1>
+        <p className="auth-page-subtitle">{t('auth.signUp.subtitle')}</p>
       </header>
 
       {topCopy && (
-        <Alert type={topError === 'EMAIL_ALREADY_REGISTERED' ? 'warning' : 'danger'} title={topCopy.title}>
-          {topCopy.body}
+        <Alert type={topError === 'EMAIL_ALREADY_REGISTERED' ? 'warning' : 'danger'} title={t(topCopy.title)}>
+          {t(topCopy.body)}
           {topError === 'EMAIL_ALREADY_REGISTERED' && (
             <>
               {' '}
-              <Link to="/signin">Sign in</Link>
+              <Link to="/signin">{t('auth.signUp.signInLink')}</Link>
               {' · '}
-              <Link to="/forgot-password">Reset password</Link>
+              <Link to="/forgot-password">{t('auth.signUp.resetLink')}</Link>
             </>
           )}
         </Alert>
       )}
 
       <form className="auth-form" onSubmit={handleSubmit} noValidate>
-        <FormField label="Email" htmlFor="signup-email" required>
+        <FormField label={t('auth.emailLabel')} htmlFor="signup-email" required>
           <Input
             id="signup-email"
             type="email"
@@ -123,9 +98,9 @@ export function SignUpPage() {
         </FormField>
 
         <FormField
-          label="Password"
+          label={t('auth.passwordLabel')}
           htmlFor="signup-password"
-          helper={PASSWORD_HINT}
+          helper={t('auth.passwordHint')}
           required
         >
           <Input
@@ -140,10 +115,10 @@ export function SignUpPage() {
         </FormField>
 
         <FormField
-          label="Display name"
+          label={t('auth.displayNameLabel')}
           htmlFor="signup-display-name"
           error={displayNameError}
-          helper="3–30 characters. Not unique — pick anything you like."
+          helper={t('auth.displayNameHelper')}
           required
         >
           <Input
@@ -159,13 +134,13 @@ export function SignUpPage() {
 
         <div className="auth-form-actions">
           <Button type="submit" variant="primary" size="large" fullWidth disabled={submitting}>
-            {submitting ? <Spinner size="small" color="white" /> : 'Create account'}
+            {submitting ? <Spinner size="small" color="white" /> : t('auth.signUp.submit')}
           </Button>
         </div>
       </form>
 
       <div className="auth-page-footer-links">
-        <Link to="/signin">Already have an account? Sign in</Link>
+        <Link to="/signin">{t('auth.signUp.haveAccount')}</Link>
       </div>
     </div>
   );

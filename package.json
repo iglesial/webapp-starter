@@ -17,8 +17,10 @@
   "dependencies": {
     "@aws-amplify/ui-react": "^6.15.4",
     "aws-amplify": "^6.18.0",
+    "i18next": "^26.4.2",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
+    "react-i18next": "^17.0.15",
     "react-router-dom": "^7.18.0"
   },
   "devDependencies": {

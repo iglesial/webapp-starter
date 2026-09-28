@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { displayNameErrorMessage, validateDisplayName } from './validation';
+import { displayNameErrorKey, validateDisplayName } from './validation';
 
 describe('validateDisplayName', () => {
   it('rejects empty input as empty', () => {
@@ -53,13 +53,14 @@ describe('validateDisplayName', () => {
   });
 });
 
-describe('displayNameErrorMessage', () => {
-  it('returns distinct messages per reason', () => {
-    const empty = displayNameErrorMessage('empty');
-    const short = displayNameErrorMessage('too-short');
-    const long = displayNameErrorMessage('too-long');
-    expect(new Set([empty, short, long]).size).toBe(3);
-    expect(short).toMatch(/at least 3/);
-    expect(long).toMatch(/at most 30/);
+describe('displayNameErrorKey', () => {
+  it('returns a distinct catalog key per reason', () => {
+    const keys = [
+      displayNameErrorKey('empty'),
+      displayNameErrorKey('too-short'),
+      displayNameErrorKey('too-long'),
+    ];
+    expect(new Set(keys).size).toBe(3);
+    for (const key of keys) expect(key).toMatch(/^validation\.displayName\./);
   });
 });

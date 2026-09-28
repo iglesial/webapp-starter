@@ -1,3 +1,5 @@
+import type { Locale } from '../i18n/locale';
+
 export type AuthStatus = 'loading' | 'unauthenticated' | 'authenticated';
 
 export interface AuthUser {
@@ -5,6 +7,7 @@ export interface AuthUser {
   email: string;
   displayName: string;
   emailVerified: boolean;
+  locale: Locale | null;
   groups: string[];
 }
 

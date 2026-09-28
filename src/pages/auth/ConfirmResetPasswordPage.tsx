@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Trans, useTranslation } from 'react-i18next';
 import { Alert } from '../../components/core/Alert';
 import { Button } from '../../components/core/Button';
 import { FormField } from '../../components/core/FormField';
@@ -7,40 +8,12 @@ import { Input } from '../../components/core/Input';
 import { Spinner } from '../../components/core/Spinner';
 import { confirmPasswordReset } from '../../services/authService';
 import { isAuthFailure, type AuthErrorCode } from '../../types/auth';
+import { authErrorCopy } from '../../i18n/authErrors';
 import './authShared.css';
 import './ConfirmResetPasswordPage.css';
 
-const PASSWORD_HINT =
-  'At least 10 characters, with upper- and lower-case letters and a number.';
-
-function errorCopy(code: AuthErrorCode): { title: string; body: string } {
-  switch (code) {
-    case 'VERIFICATION_CODE_INVALID':
-      return {
-        title: 'That code does not match.',
-        body: 'Double-check the code from your email.',
-      };
-    case 'VERIFICATION_CODE_EXPIRED':
-      return {
-        title: 'That code has expired.',
-        body: 'Request a new reset code below.',
-      };
-    case 'PASSWORD_DOES_NOT_MEET_POLICY':
-      return { title: 'Password is too weak.', body: PASSWORD_HINT };
-    case 'RATE_LIMITED_TRY_LATER':
-      return {
-        title: 'Too many attempts.',
-        body: 'Please wait a moment and try again.',
-      };
-    default:
-      return {
-        title: 'We could not reset your password.',
-        body: 'Please try again.',
-      };
-  }
-}
-
 export function ConfirmResetPasswordPage() {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const email = (location.state as { email?: string } | null)?.email ?? '';
@@ -67,31 +40,35 @@ export function ConfirmResetPasswordPage() {
     navigate('/signin', { state: { justResetEmail: email } });
   }
 
-  const copy = error ? errorCopy(error) : null;
+  const copy = error ? authErrorCopy('confirmReset', error) : null;
 
   return (
     <div className="auth-page confirm-reset-page">
       <header>
-        <h1 className="auth-page-title">Set a new password</h1>
+        <h1 className="auth-page-title">{t('auth.confirmReset.title')}</h1>
         <p className="auth-page-subtitle">
-          Enter the code we sent to <strong>{email}</strong> and choose a new password.
+          <Trans
+            i18nKey="auth.confirmReset.subtitle"
+            values={{ email }}
+            components={{ b: <strong /> }}
+          />
         </p>
       </header>
 
       {copy && (
-        <Alert type="danger" title={copy.title}>
-          {copy.body}
+        <Alert type="danger" title={t(copy.title)}>
+          {t(copy.body)}
           {error === 'VERIFICATION_CODE_EXPIRED' && (
             <>
               {' '}
-              <Link to="/forgot-password">Request a new code</Link>
+              <Link to="/forgot-password">{t('auth.confirmReset.requestNewCode')}</Link>
             </>
           )}
         </Alert>
       )}
 
       <form className="auth-form" onSubmit={handleSubmit} noValidate>
-        <FormField label="Reset code" htmlFor="reset-code" required>
+        <FormField label={t('auth.confirmReset.codeLabel')} htmlFor="reset-code" required>
           <Input
             id="reset-code"
             type="text"
@@ -104,7 +81,12 @@ export function ConfirmResetPasswordPage() {
           />
         </FormField>
 
-        <FormField label="New password" htmlFor="reset-password" helper={PASSWORD_HINT} required>
+        <FormField
+          label={t('auth.confirmReset.newPasswordLabel')}
+          htmlFor="reset-password"
+          helper={t('auth.passwordHint')}
+          required
+        >
           <Input
             id="reset-password"
             type="password"
@@ -118,13 +100,13 @@ export function ConfirmResetPasswordPage() {
 
         <div className="auth-form-actions">
           <Button type="submit" variant="primary" size="large" fullWidth disabled={submitting}>
-            {submitting ? <Spinner size="small" color="white" /> : 'Save new password'}
+            {submitting ? <Spinner size="small" color="white" /> : t('auth.confirmReset.submit')}
           </Button>
         </div>
       </form>
 
       <div className="auth-page-footer-links">
-        <Link to="/signin">Back to sign in</Link>
+        <Link to="/signin">{t('auth.forgotPassword.backToSignIn')}</Link>
       </div>
     </div>
   );

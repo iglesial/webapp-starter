@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { requestPasswordReset } from '../../services/authService';
+import { rx, rxIn } from '../../test/i18n';
 import { ForgotPasswordPage } from './ForgotPasswordPage';
 
 vi.mock('../../services/authService', () => ({
@@ -40,8 +41,8 @@ describe('ForgotPasswordPage — FR-012 anti-enumeration', () => {
     vi.mocked(requestPasswordReset).mockResolvedValue({ ok: true, value: undefined });
     renderPage();
     const user = userEvent.setup();
-    await user.type(screen.getByLabelText(/email/i), 'a@b.co');
-    await user.click(screen.getByRole('button', { name: /send reset code/i }));
+    await user.type(screen.getByLabelText(rxIn('auth.emailLabel')), 'a@b.co');
+    await user.click(screen.getByRole('button', { name: rx('auth.forgotPassword.submit') }));
     await waitFor(() =>
       expect(screen.getByTestId('landed')).toHaveTextContent('/forgot-password/confirm|a@b.co'),
     );
@@ -52,13 +53,21 @@ describe('ForgotPasswordPage — FR-012 anti-enumeration', () => {
     vi.mocked(requestPasswordReset).mockResolvedValue({ ok: true, value: undefined });
     renderPage();
     const user = userEvent.setup();
-    await user.type(screen.getByLabelText(/email/i), 'ghost@b.co');
-    await user.click(screen.getByRole('button', { name: /send reset code/i }));
+    await user.type(screen.getByLabelText(rxIn('auth.emailLabel')), 'ghost@b.co');
+    await user.click(screen.getByRole('button', { name: rx('auth.forgotPassword.submit') }));
     await waitFor(() =>
       expect(screen.getByTestId('landed')).toHaveTextContent(
         '/forgot-password/confirm|ghost@b.co',
       ),
     );
+    // FR-012: the exact wording IS the contract — nothing rendered may hint
+    // that the address is unknown. Literal strings, not catalog lookups: a
+    // lookup would compare the copy against itself and keep passing even if
+    // someone reintroduced an enumeration-revealing message.
+    expect(document.body.textContent).not.toMatch(
+      /inconnu|introuvable|n’existe pas|aucun compte/i,
+    );
+    expect(document.body.textContent).not.toMatch(/unknown|not found|no account/i);
   });
 
   it('surfaces RATE_LIMITED_TRY_LATER explicitly and does NOT navigate', async () => {
@@ -68,9 +77,13 @@ describe('ForgotPasswordPage — FR-012 anti-enumeration', () => {
     });
     renderPage();
     const user = userEvent.setup();
-    await user.type(screen.getByLabelText(/email/i), 'a@b.co');
-    await user.click(screen.getByRole('button', { name: /send reset code/i }));
-    await waitFor(() => expect(screen.getByText(/too many attempts/i)).toBeInTheDocument());
+    await user.type(screen.getByLabelText(rxIn('auth.emailLabel')), 'a@b.co');
+    await user.click(screen.getByRole('button', { name: rx('auth.forgotPassword.submit') }));
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        rxIn('errors.auth.forgotPassword.RATE_LIMITED_TRY_LATER.title'),
+      ),
+    );
     expect(screen.queryByTestId('landed')).not.toBeInTheDocument();
   });
 
@@ -78,8 +91,8 @@ describe('ForgotPasswordPage — FR-012 anti-enumeration', () => {
     vi.mocked(requestPasswordReset).mockResolvedValue({ ok: true, value: undefined });
     renderPage();
     const user = userEvent.setup();
-    await user.type(screen.getByLabelText(/email/i), '  a@b.co  ');
-    await user.click(screen.getByRole('button', { name: /send reset code/i }));
+    await user.type(screen.getByLabelText(rxIn('auth.emailLabel')), '  a@b.co  ');
+    await user.click(screen.getByRole('button', { name: rx('auth.forgotPassword.submit') }));
     await waitFor(() => expect(requestPasswordReset).toHaveBeenCalledWith('a@b.co'));
   });
 });

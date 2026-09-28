@@ -4,6 +4,8 @@ import { BrowserRouter } from 'react-router-dom';
 import { Amplify } from 'aws-amplify';
 import outputs from '../amplify_outputs.json';
 import { AuthProvider } from './contexts/AuthProvider';
+import { LocaleProvider } from './contexts/LocaleProvider';
+import './i18n/config';
 import './index.css';
 import App from './App.tsx';
 
@@ -13,7 +15,9 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <App />
+        <LocaleProvider>
+          <App />
+        </LocaleProvider>
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>,
