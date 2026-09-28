@@ -1,0 +1,39 @@
+/* Set apart from the rest of the profile on purpose: an irreversible action
+   should not sit in the same visual group as "edit display name". */
+.delete-account {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  text-align: left;
+}
+
+.delete-account-heading {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+}
+
+.delete-account-intro {
+  margin: 0 0 1rem 0;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.delete-account-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: left;
+  line-height: 1.5;
+}
+
+.delete-account-dialog p {
+  margin: 0;
+}
+
+.delete-account-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}

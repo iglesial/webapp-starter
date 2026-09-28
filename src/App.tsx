@@ -11,11 +11,14 @@ import { ConfirmSignUpPage } from './pages/auth/ConfirmSignUpPage';
 import { SignInPage } from './pages/auth/SignInPage';
 import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
 import { ConfirmResetPasswordPage } from './pages/auth/ConfirmResetPasswordPage';
-import { ProfilePage } from './pages/ProfilePage';
 
 // Lazy-load what most visitors never open, so it stays out of the main
-// bundle. The admin area is the example: only admins download it. The
-// named-export shim is because React.lazy expects a default export.
+// bundle: the admin area (only admins download it) and the profile page, which
+// pulls in the AppSync data client. The named-export shim is because
+// React.lazy expects a default export.
+const ProfilePage = lazy(() =>
+  import('./pages/ProfilePage').then((m) => ({ default: m.ProfilePage })),
+);
 const AdminHomePage = lazy(() =>
   import('./pages/admin/AdminHomePage').then((m) => ({ default: m.AdminHomePage })),
 );
@@ -39,7 +42,9 @@ function App() {
           path="/profile"
           element={
             <ProtectedRoute>
-              <ProfilePage />
+              <Suspense fallback={<Spinner size="large" />}>
+                <ProfilePage />
+              </Suspense>
             </ProtectedRoute>
           }
         />

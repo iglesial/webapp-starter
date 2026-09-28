@@ -5,6 +5,7 @@ import { Alert } from '../components/core/Alert';
 import { Button } from '../components/core/Button';
 import { Card } from '../components/core/Card';
 import { LocaleToggle } from '../components/layout/LocaleToggle';
+import { DeleteAccountSection } from '../components/profile/DeleteAccountSection';
 import { FormField } from '../components/core/FormField';
 import { Input } from '../components/core/Input';
 import { Spinner } from '../components/core/Spinner';
@@ -169,6 +170,8 @@ export function ProfilePage() {
           {t('nav.signOut')}
         </Button>
       </div>
+
+      <DeleteAccountSection />
     </div>
   );
 }
