@@ -1,0 +1,45 @@
+.admin-home-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.admin-home-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.admin-home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.admin-home-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.admin-home-empty {
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.admin-home-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+}
+
+.admin-home-card-desc {
+  color: var(--text);
+  margin: 0;
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-home-link .card {
+    transition: none;
+  }
+}

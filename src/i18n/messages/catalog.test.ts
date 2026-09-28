@@ -38,7 +38,8 @@ describe('message catalogs', () => {
   // explicitly keeps the check below able to catch a genuinely forgotten
   // translation.
   const IDENTICAL_BY_DESIGN = new Set<string>([
-    'home.brand', // product name — never translated
+    'common.appName', // product name — never translated
+    'common.copyright', // "© {{appName}}" — nothing to translate
   ]);
 
   it('are actually translated (no French entry left identical to English)', () => {

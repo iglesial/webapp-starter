@@ -1,4 +1,7 @@
 .hero {
+  /* No global border-box reset exists; without this, width: 100% plus the
+     horizontal padding overflows the parent container. */
+  box-sizing: border-box;
   position: relative;
   width: 100%;
   display: flex;

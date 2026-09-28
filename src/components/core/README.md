@@ -56,6 +56,31 @@ Multiline text input component with error handling.
 />
 ```
 
+### FileInput
+File picker with a styled button. The native input cannot be styled, so it is
+visually hidden (not `display: none`, which would make it unfocusable) and a
+`<label>` acts as the button. Exists because `Input` deliberately excludes
+`type="file"` from its `type` union.
+
+**Props:**
+- `id`: string (required — links the label to the input)
+- `accept`: string (MIME types or extensions)
+- `label`: string (the button text)
+- `hint`: string (optional — shown beside the button, e.g. the chosen filename)
+- `disabled`: boolean
+- `onSelect`: `(file: File | null) => void`
+
+**Example:**
+```tsx
+<FileInput
+  id="avatar"
+  accept="image/png,image/jpeg,image/webp"
+  label="Choose image…"
+  hint="PNG, JPEG or WebP"
+  onSelect={(file) => void handleAvatar(file)}
+/>
+```
+
 ### Card
 Card container with hover effects and padding options.
 
@@ -127,6 +152,8 @@ Progress indicator with variants and label display.
 - `showLabel`: boolean (default: false)
 - `size`: 'small' | 'medium' | 'large' (default: 'medium')
 - `variant`: 'primary' | 'success' | 'warning' | 'danger' (default: 'primary')
+- `label`: string (optional accessible name — pass one when a page shows several bars)
+- `className`: string
 
 **Example:**
 ```tsx
@@ -155,28 +182,56 @@ Form field wrapper with label, validation, and helper text.
 </FormField>
 ```
 
+### Checkbox
+A native checkbox with its label. Native on purpose: consent has to start
+unticked and read unambiguously to assistive tech as checked/unchecked.
+
+**Props:**
+- `checked`: boolean (required)
+- `onChange`: `(checked: boolean) => void` (required)
+- `label`: ReactNode (required — can carry links via `<Trans>`)
+- `disabled`: boolean
+- `id`: string (optional; generated with `useId` otherwise)
+
+**Example:**
+```tsx
+<Checkbox checked={agreed} onChange={setAgreed} label={t('account.confirm')} />
+```
+
+### Switch
+An on/off toggle (`role="switch"`). The label is the accessible name and must
+describe what ON means ("Raw JSON"), not what pressing does ("Show raw JSON").
+
+**Props:**
+- `checked`: boolean (required)
+- `onChange`: `(checked: boolean) => void` (required)
+- `label`: string (required)
+
+**Example:**
+```tsx
+<Switch checked={raw} onChange={setRaw} label="Raw JSON" />
+```
+
+### Toast
+A transient report, portalled to `document.body` and auto-dismissed (10s by
+default). Render it conditionally and clear your state in `onDismiss`.
+
+**Props:**
+- `children`: ReactNode (required)
+- `variant`: 'success' | 'danger' | 'info' (default: 'success')
+- `onDismiss`: `() => void` (required — keep it stable, e.g. `useCallback`)
+- `durationMs`: number (default: 10000)
+
+**Example:**
+```tsx
+{message && <Toast onDismiss={clearMessage}>{message}</Toast>}
+```
+
 ## Design Tokens
 
-All components use CSS variables defined in `src/index.css`:
-
-**Colors:**
-- `--primary`: #f97316 (orange)
-- `--primary-hover`: #ea580c
-- `--success`: #22c55e
-- `--danger`: #ef4444
-- `--warning`: #eab308
-- `--info`: #3b82f6
-
-**Spacing:**
-- `--radius`: 12px
-- `--radius-sm`: 6px
-- `--radius-lg`: 16px
-
-**Shadows:**
-- `--shadow-sm`: Subtle shadow
-- `--shadow-md`: Medium shadow
-- `--shadow-lg`: Large shadow
-
-## Preview
-
-View all components in development mode at `/preview`.
+All components use CSS custom properties defined in `src/index.css` (`:root`,
+with overrides under `prefers-color-scheme: dark`). Reference tokens rather than
+raw colours, and define a token before using it: an undefined `var(--x)` fails
+silently and paints nothing. `src/designTokens.test.ts` fails the build on any
+token used without a fallback that is never defined, and on a status token
+(`--success`, `--warning`, `--danger`, `--track`) missing from either theme.

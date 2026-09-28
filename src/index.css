@@ -12,9 +12,23 @@
     rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 
   /* Aliases consumed by src/components/core primitives (Button, Card, etc.). */
-  --primary: var(--accent);
-  --primary-hover: #8a2fd9;
-  --danger: #ef4444;
+  /* Filled controls. Each fill has an --on-* text colour chosen per theme so
+     the pair clears WCAG AA (4.5:1) — designTokens.test.ts enforces it. The
+     fill is a shade deeper than --accent because white on #aa3bff is 4.4:1. */
+  --primary: #9333ea;
+  --primary-hover: #7e22ce;
+  --on-primary: #fff;
+  --danger: #dc2626;
+  --danger-hover: #b91c1c;
+  --on-danger: #fff;
+  /* Status colours (ProgressBar, Toast). Undefined tokens fail silently —
+     `background: var(--success)` paints nothing — so designTokens.test.ts
+     checks every reference. */
+  --success: #16a34a;
+  --warning: #ea580c;
+  /* The neutral groove behind a progress fill or a switch. Not --bg-main:
+     that is white, so the empty part of a bar vanished on a white card. */
+  --track: #e8e8ed;
   --bg-main: var(--bg);
   --bg-card: var(--bg);
   --text-main: var(--text-h);
@@ -24,6 +38,7 @@
   --radius-md: 8px;
   --shadow-sm: rgba(0, 0, 0, 0.08) 0 2px 4px;
   --shadow-md: rgba(0, 0, 0, 0.12) 0 8px 20px -4px;
+  --shadow-lg: rgba(0, 0, 0, 0.18) 0 16px 40px -8px;
 
   /* z-index scale */
   --z-sticky: 10;
@@ -62,8 +77,20 @@
     --shadow:
       rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
 
-    --primary-hover: #a85ae0;
+    /* Light fills with dark text: white on a lifted purple or red is under
+       3:1, and a darker fill would vanish into the dark background. */
+    --primary: #c084fc;
+    --primary-hover: #d8b4fe;
+    --on-primary: #16171d;
     --danger: #f87171;
+    --danger-hover: #fca5a5;
+    --on-danger: #16171d;
+    /* Lifted: the light-mode values are too dark against the dark bg to
+       read as status. */
+    --success: #34d399;
+    --warning: #fb923c;
+    /* Lighter than the card it sits on, so it reads as an empty track. */
+    --track: #2f2f36;
     --bg-card: #1f2028;
     --shadow-sm: rgba(0, 0, 0, 0.3) 0 2px 4px;
   }
