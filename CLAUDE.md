@@ -14,23 +14,29 @@
 
 ```text
 amplify/
-├── auth/resource.ts        # defineAuth (Cognito User Pool)
-├── data/resource.ts        # defineData — HealthCheck example model
-└── backend.ts              # defineBackend composition
+├── auth/resource.ts        # defineAuth (Cognito User Pool) + post-confirmation trigger
+├── data/resource.ts        # defineData — HealthCheck example model, deleteMyAccount mutation
+├── functions/
+│   ├── account/            # deleteMyAccount: per-user data cascade, then the Cognito user LAST
+│   ├── post-confirmation/  # Cognito trigger: Discord “new signup” (never throws)
+│   └── shared/             # appsync (identityOf, throwOnErrors, collectAll), dataClient, notify
+└── backend.ts              # defineBackend composition, scoped IAM grants, branch env vars
 
 src/
 ├── components/
 │   ├── core/               # reusable primitives (colocated CSS + tests)
 │   ├── auth/               # ProtectedRoute, AdminOnlyRoute guards
-│   └── layout/             # AppShell (Navbar + Outlet + Footer), LocaleToggle
+│   ├── layout/             # AppShell (Navbar + Outlet + Footer), LocaleToggle
+│   └── profile/            # DeleteAccountSection
 ├── config/                 # app-level constants (AFTER_SIGN_IN_PATH)
 ├── contexts/               # AuthContext/AuthProvider, LocaleContext/LocaleProvider
 ├── hooks/                  # useAuth, useLocale
 ├── i18n/                   # i18next config, locale rules, Intl formatters, typed catalogs
 ├── pages/                  # HomePage, ProfilePage, auth/*, admin/* (English-only)
 ├── services/               # authService (Amplify wrapper)
+│   └── data/               # shared dataClient + accountService
 ├── types/                  # shared TS types (auth)
-├── utils/                  # pure helpers (validation)
+├── utils/                  # pure helpers (validation, *_ERROR_CODES)
 ├── test/                   # Vitest setup + i18n test helpers (tt/rx/rxIn)
 ├── designTokens.test.ts    # every var(--x) is defined; filled controls clear WCAG AA
 ├── App.tsx
@@ -46,7 +52,7 @@ Tests are colocated (`<Name>.test.ts(x)`); there is no top-level `tests/` direct
 - `/signup`, `/confirm`       — sign-up + email confirmation
 - `/signin`                   — sign-in
 - `/forgot-password`, `/forgot-password/confirm` — password reset flow
-- `/profile`                  — ProtectedRoute: display name, language, sign out
+- `/profile`                  — ProtectedRoute: display name, language, sign out, self-service account deletion
 - `/admin`                    — AdminOnlyRoute (renders an Outlet): admin home, nest admin pages under it
 
 Every route renders inside `AppShell` (navbar + footer) via a layout route in `App.tsx`. Heavy or rarely-visited pages are `React.lazy` + `Suspense` (the admin area is the example).
@@ -61,7 +67,7 @@ Every route renders inside `AppShell` (navbar + footer) via a layout route in `A
 - `npm run synth` — synthesize the Amplify backend locally, with no AWS call
 - `npx ampx sandbox` — Amplify Gen 2 sandbox (run in a second terminal when developing)
 
-**Run `npm run synth` after any change under `amplify/`.** A whole class of mistake typechecks, passes every test, and then fails the branch deploy minutes later: circular dependencies between nested stacks, a malformed `schedule` cron, an invalid policy. `synth` catches those in about a minute against nothing. CI runs it too.
+**Run `npm run synth` after any change under `amplify/`.** A whole class of mistake typechecks, passes every test, and then fails the branch deploy minutes later: circular dependencies between nested stacks, a malformed `schedule` cron, an invalid policy. `synth` catches those in about a minute against nothing. CI runs it too. It passes `@aws-cdk/core:validateAgainstDefaultRules=true` on purpose: without that flag CDK reports a circular dependency as a **warning and exits 0**, so the check would pass a backend that cannot deploy.
 
 ### Pinned dependencies — do not bump casually
 
@@ -89,3 +95,18 @@ The app is **English by default, switchable to French**. To make French the defa
 - **Formatting** goes through `src/i18n/format.ts` (`Intl`): `useLocale()` gives `formatPrice`/`formatDateTime` bound to the active language. Never `toLocaleString()` with no locale, and never hand-format currency.
 - **Tests** query copy through `src/test/i18n.ts` (`tt`/`rx`/`rxIn`/`looseText`) so they follow the language. Do not assert `getByText(tt('x'))` as a test's only assertion — both sides read the same catalog, so it is a tautology. Assert literal strings only where the exact wording is the contract (e.g. sign-in errors that must not reveal whether an account exists). `src/test/setup.ts` pins the test language; `playwright.config.ts` pins the browser locale.
 - **French register**: vouvoiement ("vous", never "tu").
+
+## Backend (Amplify functions)
+
+- **Identity comes from the token, never from arguments.** A mutation that acts on "my" data takes no user id; the Lambda reads `event.identity` via `identityOf()` in `amplify/functions/shared/appsync.ts`. An id argument lets any signed-in user act on any other.
+- **The data client reports failures in `errors`, it does not throw.** Call `throwOnErrors()` after every write, and page with `collectAll()` whenever you must see every row — a list returns one page (100 rows) by default.
+- **Grant the narrowest permission to the one function that needs it.** `AdminDeleteUser` is granted to `account` alone, scoped to this user pool, in `backend.ts`. Data access (`allow.resource(fn)`) can only be granted at schema level in this version, so it is full access — keep functions that hold it small.
+- **A Cognito trigger goes in `resourceGroupName: auth`.** In the default `function` group it creates a circular dependency with any function that references the user pool, and the deploy fails. `npm run synth` catches it.
+- **Branch environment variables vs `secret()`**: a value whose absence should degrade gracefully (the Discord webhook) is a branch env var read at synth time in `backend.ts`; a value the function cannot work without (an API key) is a `secret()`, so a missing one fails loudly.
+- **Operator notifications carry no personal data** — see `amplify/functions/shared/notifications.ts`. `notifyDiscord` never throws and never logs the webhook URL.
+
+### Account deletion
+
+`/profile` → `deleteMyAccount` → `amplify/functions/account/`. The handler runs `ACCOUNT_CLEANUPS` in order, then deletes the Cognito user **last**, so a failure part-way leaves an account the user can still sign into and retry — never data nobody can reach. It is safe to re-run.
+
+**Every model that stores per-user data needs an entry in `ACCOUNT_CLEANUPS`** (`deleteAccountData.ts` has a worked example); `deleteAccountData.test.ts` fails the day the list stops being empty, as a reminder to check it deletes everything. If your app must keep something after deletion, say so in `account.deletedList` before the user confirms.

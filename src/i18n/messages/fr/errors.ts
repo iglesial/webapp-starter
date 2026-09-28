@@ -1,6 +1,10 @@
 export const errors = {
   // Generic fallback for unexpected errors (log them with console.error).
   unknown: 'Une erreur est survenue. Veuillez réessayer.',
+  account: {
+    ACCOUNT_DELETE_FAILED:
+      'La suppression n’a pas abouti. Veuillez réessayer : l’opération reprend là où elle s’est arrêtée.',
+  },
   auth: {
     signIn: {
       INVALID_CREDENTIALS: {

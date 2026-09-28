@@ -12,6 +12,7 @@ import { auth } from './auth';
 import { errors } from './errors';
 import { validation } from './validation';
 import { profile } from './profile';
+import { account } from './account';
 
 export const en = {
   common,
@@ -22,4 +23,5 @@ export const en = {
   errors,
   validation,
   profile,
+  account,
 } as const;

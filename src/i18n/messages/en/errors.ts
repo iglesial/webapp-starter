@@ -1,6 +1,10 @@
 export const errors = {
   // Generic fallback for unexpected errors (log them with console.error).
   unknown: 'Something went wrong. Please try again.',
+  account: {
+    ACCOUNT_DELETE_FAILED:
+      'The deletion did not complete. Please try again — it picks up where it stopped.',
+  },
   auth: {
     signIn: {
       INVALID_CREDENTIALS: {

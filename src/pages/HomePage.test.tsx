@@ -42,3 +42,18 @@ describe('HomePage', () => {
     expect(screen.getByTestId('landed-at')).toHaveTextContent('/signin');
   });
 });
+
+describe('HomePage — after account deletion', () => {
+  it('confirms the deletion only when arriving from it', () => {
+    const { unmount } = render(
+      <MemoryRouter initialEntries={[{ pathname: '/', state: { accountDeleted: true } }]}>
+        <HomePage />
+      </MemoryRouter>,
+    );
+    expect(screen.getByRole('status')).toHaveTextContent(tt('account.deletedToast'));
+    unmount();
+
+    renderHome();
+    expect(screen.queryByText(tt('account.deletedToast'))).not.toBeInTheDocument();
+  });
+});

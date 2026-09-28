@@ -21,6 +21,8 @@ The sandbox writes `amplify_outputs.json` into the repo root; `src/main.tsx` rea
 - Core UI primitives in `src/components/core/` (Alert, Badge, Button, Card, Checkbox, FileInput, FormField, Hero, Input, Modal, ProgressBar, Select, Spinner, Switch, Textarea, Toast) with colocated tests — see its README
 - `AppShell` layout: responsive navbar (hamburger under 1024px, language toggle, auth-aware links) and footer on every page
 - Light and dark themes from design tokens in `src/index.css`, with a test that fails on undefined tokens or low-contrast buttons
+- Self-service account deletion from `/profile`: an explicit confirmation, then a Lambda that deletes per-user data and the Cognito user last (extend `ACCOUNT_CLEANUPS` as you add per-user models)
+- Cognito post-confirmation trigger posting “new signup” to Discord when `DISCORD_WEBHOOK_URL` is set (silent otherwise; no personal data)
 - Admin home at `/admin` (card grid; nest your admin pages under it), lazy-loaded
 - i18n with `react-i18next`: English by default, French included, typed catalogs (a missing translation is a compile error), language saved to the Cognito account, `Intl` price/date formatters. Flip `DEFAULT_LOCALE` in `src/i18n/locale.ts` to change the default.
 - `HealthCheck` data model in `amplify/data/resource.ts` as a wiring example — replace with your own models
@@ -49,6 +51,17 @@ npm run synth        # synthesize the Amplify backend locally — run after any 
 ```
 
 CI (`.github/workflows/pr-check.yml`) runs typecheck, lint, unit tests and synth on every PR. `amplify.yml` is the Amplify Hosting build spec (Node 22, backend `pipeline-deploy`, then the frontend build).
+
+## Environment variables
+
+Set these as **branch environment variables** in the Amplify console (they are read by `amplify/backend.ts` at deploy time). All are optional.
+
+| Variable | Effect |
+|----------|--------|
+| `DISCORD_WEBHOOK_URL` | Posts operator notifications (currently: new sign-ups) to this Discord channel. Unset = silent. |
+| `DISCORD_WEBHOOK_URL_SIGNUP` | Sends sign-up notifications to a different channel than the shared one. |
+
+The webhook URL is a credential — anyone holding it can post to the channel. It is never logged; rotate it by deleting the webhook in Discord.
 
 ## Next steps after using the template
 
