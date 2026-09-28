@@ -5,9 +5,10 @@ import { rx, tt } from '../test/i18n';
 
 // Each test picks the configuration it needs: the template's empty one, or a
 // filled-in one standing for an app that has done its homework.
-const config = vi.hoisted(() => ({ filled: false, analytics: false }));
+const config = vi.hoisted(() => ({ filled: false, analytics: false, payments: false }));
 
 vi.mock('../analytics', () => ({ isAnalyticsEnabled: () => config.analytics }));
+vi.mock('../modules/payments/enabled', () => ({ isPaymentsEnabled: () => config.payments }));
 
 vi.mock('../data/legalEntity', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../data/legalEntity')>();
@@ -47,6 +48,7 @@ function renderPage(page: 'notice' | 'privacy') {
 beforeEach(() => {
   config.filled = false;
   config.analytics = false;
+  config.payments = false;
 });
 
 describe('legal pages — as shipped by the template', () => {
@@ -133,5 +135,22 @@ describe('privacy policy — analytics disclosure', () => {
   it('always names the host', () => {
     renderPage('privacy');
     expect(screen.getByRole('link', { name: 'Amazon Web Services' })).toBeInTheDocument();
+  });
+});
+
+// Same rule for the optional payments module.
+describe('privacy policy — payments disclosure', () => {
+  it('says nothing about payments while the module is off', () => {
+    renderPage('privacy');
+    expect(screen.queryByRole('link', { name: 'Stripe' })).toBeNull();
+    expect(screen.queryByText(tt('payments.legal.purpose'))).toBeNull();
+  });
+
+  it('discloses Stripe, the payment purpose and proof-of-purchase retention when on', () => {
+    config.payments = true;
+    renderPage('privacy');
+    expect(screen.getByRole('link', { name: 'Stripe' })).toBeInTheDocument();
+    expect(screen.getByText(tt('payments.legal.purpose'))).toBeInTheDocument();
+    expect(screen.getByText(tt('payments.legal.retentionValue'))).toBeInTheDocument();
   });
 });

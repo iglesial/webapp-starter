@@ -38,3 +38,9 @@ test('the legal pages are reachable from the footer of any page', async ({ page 
   await footer.getByRole('link', { name: 'Privacy' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Privacy policy' })).toBeVisible();
 });
+
+// The payments module ships switched off: its routes must not exist.
+test('checkout routes do not exist while payments are off', async ({ page }) => {
+  await page.goto('/checkout/pro');
+  await expect(page.getByText('Page not found.')).toBeVisible();
+});

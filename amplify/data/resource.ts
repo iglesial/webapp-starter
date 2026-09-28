@@ -1,5 +1,9 @@
 import { type ClientSchema, a, defineData } from '@aws-amplify/backend';
 import { account } from '../functions/account/resource';
+import { PAYMENTS_ENABLED } from '../modules/payments/config';
+import { paymentsSchema } from '../modules/payments/schema';
+import { checkout } from '../modules/payments/checkout/resource';
+import { stripeWebhook } from '../modules/payments/webhook/resource';
 
 const schema = a
   .schema({
@@ -22,12 +26,18 @@ const schema = a
       .returns(a.ref('DeleteAccountResult'))
       .handler(a.handler.function(account))
       .authorization((allow) => [allow.authenticated()]),
+
+    // Optional module: absent unless PAYMENTS_ENABLED=true at synth time.
+    ...(PAYMENTS_ENABLED ? paymentsSchema : {}),
   })
-  // Grants the function full data access so it can delete every model's rows.
-  // Schema level is the only placement for allow.resource in this version of
-  // the data schema. The Cognito delete permission — what actually makes this
-  // function sensitive — is granted to it alone in backend.ts.
-  .authorization((allow) => [allow.resource(account)]);
+  // Grants these functions full data access. Schema level is the only
+  // placement for allow.resource in this version of the data schema, so keep
+  // functions holding it small. The Cognito delete permission — what actually
+  // makes `account` sensitive — is granted to it alone in backend.ts.
+  .authorization((allow) => [
+    allow.resource(account),
+    ...(PAYMENTS_ENABLED ? [allow.resource(checkout), allow.resource(stripeWebhook)] : []),
+  ]);
 
 export type Schema = ClientSchema<typeof schema>;
 

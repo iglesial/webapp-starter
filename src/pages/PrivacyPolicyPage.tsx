@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { Alert } from '../components/core/Alert';
+import type { ParseKeys } from 'i18next';
 import { isAnalyticsEnabled } from '../analytics';
+// Optional module: its disclosures appear only while it is switched on.
+import { isPaymentsEnabled } from '../modules/payments/enabled';
 import {
   CONTACT_EMAIL,
   PROCESSORS,
@@ -13,17 +16,31 @@ import './LegalPages.css';
 // Bump whenever what the app collects changes — and change the page with it.
 const LAST_UPDATED = '2026-09-28';
 
-// Plausible is a processor only when it is switched on; the policy must not
-// disclose a tracker that is not running, nor omit one that is.
-const PLAUSIBLE = {
+type MessageKey = ParseKeys<'translation'>;
+
+interface Processor {
+  name: string;
+  url: string;
+  label: MessageKey;
+}
+
+// Optional processors are listed only while they are switched on: the policy
+// must not disclose a processor that is not in use, nor omit one that is.
+const PLAUSIBLE: Processor = {
   name: 'Plausible Analytics',
-  purposeKey: 'analytics',
   url: 'https://plausible.io/privacy',
-} as const;
+  label: 'legal.processor.analytics',
+};
+const STRIPE: Processor = {
+  name: 'Stripe',
+  url: 'https://stripe.com/privacy',
+  label: 'payments.legal.processor',
+};
 
 export function PrivacyPolicyPage() {
   const { t } = useTranslation();
   const analytics = isAnalyticsEnabled();
+  const payments = isPaymentsEnabled();
   // Never a mailto: with no address — that renders "write to ." and a dead
   // link. The placeholder is visible on purpose, next to the notConfigured
   // banner, so nobody ships it unnoticed.
@@ -38,14 +55,26 @@ export function PrivacyPolicyPage() {
     ...(analytics
       ? ([['legal.purpose.analytics', 'legal.purpose.analyticsData', 'legal.basisLegitimate']] as const)
       : []),
+    ...(payments
+      ? ([['payments.legal.purpose', 'payments.legal.purposeData', 'payments.legal.basis']] as const)
+      : []),
   ] as const;
 
   const retention = [
     ['legal.retention.account', 'legal.retention.accountValue'],
     ...(analytics ? ([['legal.retention.analytics', 'legal.retention.analyticsValue']] as const) : []),
+    ...(payments ? ([['payments.legal.retention', 'payments.legal.retentionValue']] as const) : []),
   ] as const;
 
-  const processors = [...PROCESSORS, ...(analytics ? [PLAUSIBLE] : [])];
+  const processors: Processor[] = [
+    ...PROCESSORS.map((p) => ({
+      name: p.name,
+      url: p.url,
+      label: `legal.processor.${p.purposeKey}` as const,
+    })),
+    ...(analytics ? [PLAUSIBLE] : []),
+    ...(payments ? [STRIPE] : []),
+  ];
 
   return (
     <main className="legal-page">
@@ -116,7 +145,7 @@ export function PrivacyPolicyPage() {
               <a href={processor.url} target="_blank" rel="noreferrer noopener">
                 {processor.name}
               </a>{' '}
-              — {t(`legal.processor.${processor.purposeKey}`)}
+              — {t(processor.label)}
             </li>
           ))}
         </ul>
