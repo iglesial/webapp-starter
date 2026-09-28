@@ -26,6 +26,8 @@ The sandbox writes `amplify_outputs.json` into the repo root; `src/main.tsx` rea
 - S3 storage with audience-by-prefix access (`public/*` for everyone, `members/*` for signed-in users, admin-only writes), a client-side resize-to-WebP upload service, and a cached signed-URL hook
 - Legal notice (`/legal`) and privacy policy (`/privacy`) templates driven by `src/data/legalEntity.ts`, flagged as "not configured" until you fill it in
 - Optional cookieless analytics (Plausible) via `VITE_PLAUSIBLE_DOMAIN`
+- Optional modules in `src/modules/` (each removable — see its README):
+  - **markdown**: safe Markdown rendering with an allowlisted `::video` (click-to-load) and `:::callout` widget, lazy-loaded
 - Admin home at `/admin` (card grid; nest your admin pages under it), lazy-loaded
 - i18n with `react-i18next`: English by default, French included, typed catalogs (a missing translation is a compile error), language saved to the Cognito account, `Intl` price/date formatters. Flip `DEFAULT_LOCALE` in `src/i18n/locale.ts` to change the default.
 - `HealthCheck` data model in `amplify/data/resource.ts` as a wiring example — replace with your own models

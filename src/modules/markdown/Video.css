@@ -1,0 +1,73 @@
+.md-video {
+  /* Dark in both themes, like any video player: the facade stands in for the
+     video frame. Module-local tokens, so the module owns its palette. */
+  --md-video-bg: #16171d;
+  --md-video-bg-2: #2e303a;
+  --md-video-fg: #fff;
+  --md-video-fg-sub: rgba(255, 255, 255, 0.78);
+  margin: 1.5rem 0;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--md-video-bg);
+}
+
+.md-video-frame {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+/* The stand-in shown until the reader clicks. A button, not a div: it is the
+   control that loads the video, and it must be reachable by keyboard. */
+.md-video-facade {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 0;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--md-video-bg), var(--md-video-bg-2));
+  color: var(--md-video-fg);
+  font: inherit;
+  padding: 1rem;
+  text-align: center;
+}
+
+.md-video-facade:hover .md-video-play,
+.md-video-facade:focus-visible .md-video-play {
+  transform: scale(1.1);
+}
+
+.md-video-play {
+  font-size: 1.5rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.15);
+  transition: transform 150ms ease;
+}
+
+.md-video-label {
+  font-weight: 600;
+}
+
+.md-video-hint {
+  font-size: 0.8125rem;
+  color: var(--md-video-fg-sub);
+}
+
+.md-video-invalid {
+  margin: 1.5rem 0;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--danger);
+  color: var(--text);
+  font-size: 0.9375rem;
+}

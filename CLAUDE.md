@@ -33,6 +33,8 @@ src/
 ├── data/legalEntity.ts     # publisher identity, host, processors — fill in before launch
 ├── contexts/               # AuthContext/AuthProvider, LocaleContext/LocaleProvider
 ├── hooks/                  # useAuth, useLocale, useStorageUrl
+├── modules/                # optional, self-contained features — each has a README with removal steps
+│   └── markdown/           # SafeMarkdown + LazyMarkdown, directive allowlist (video, callout)
 ├── i18n/                   # i18next config, locale rules, Intl formatters, typed catalogs
 ├── pages/                  # HomePage, ProfilePage, auth/*, admin/* (English-only)
 ├── services/               # authService (Amplify wrapper)
@@ -133,3 +135,9 @@ The app is **English by default, switchable to French**. To make French the defa
 - **The privacy policy must describe what the app actually does.** Every per-user model, processor or tracker you add means a row in its purposes/retention tables, an entry in `PROCESSORS`, and a matching `legal.*` catalog key — in the same change. Bump `LAST_UPDATED` in `PrivacyPolicyPage.tsx`.
 - **Analytics is Plausible (cookieless) and off unless `VITE_PLAUSIBLE_DOMAIN` is set.** The privacy policy discloses it exactly when it runs. Adding a tracker that sets cookies means a consent banner *before* it loads.
 - `VITE_*` variables are inlined into the public bundle: never put a secret in one.
+
+## Optional modules (`src/modules/`)
+
+Each module is self-contained, documented in its own `README.md` (usage, rules, **how to remove it**), and has its own catalog namespace. Keep it that way: a module imports from the core app, never the reverse, except at the one documented entry point.
+
+- **markdown** — render author-written Markdown. `rehype-raw`, a `urlTransform` override and `dangerouslySetInnerHTML` are forbidden (tests assert their absence); widgets are an allowlist in `directives.ts`; videos are click-to-load for privacy. Use `LazyMarkdown` so the parser stays out of the main bundle.
