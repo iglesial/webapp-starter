@@ -49,8 +49,18 @@ Tests are colocated (`<Name>.test.ts(x)`); there is no top-level `tests/` direct
 - `npm run dev` — Vite dev server
 - `npm run test:run` — Vitest single run
 - `npm run lint` — ESLint
-- `npm run typecheck` — `tsc -b --noEmit`
+- `npm run typecheck` — `tsc -b --noEmit`, plus the `amplify/` project
+- `npm run test:e2e` — Playwright, against a dev server it starts on port 5199 (`E2E_PORT` to change)
+- `npm run synth` — synthesize the Amplify backend locally, with no AWS call
 - `npx ampx sandbox` — Amplify Gen 2 sandbox (run in a second terminal when developing)
+
+**Run `npm run synth` after any change under `amplify/`.** A whole class of mistake typechecks, passes every test, and then fails the branch deploy minutes later: circular dependencies between nested stacks, a malformed `schedule` cron, an invalid policy. `synth` catches those in about a minute against nothing. CI runs it too.
+
+### Pinned dependencies — do not bump casually
+
+- `@aws-amplify/backend-cli` is pinned to **1.5.0**: newer versions pull `@aws-amplify/backend-deployer` ≥ 2, whose synth never writes `cdk.out/manifest.json`, so `ampx pipeline-deploy` fails on Amplify Hosting after synth "succeeds" (aws-amplify/amplify-backend#3271). Re-test a real branch deploy before unpinning.
+- `@emnapi/core` / `@emnapi/runtime` are direct devDependencies only so npm records them in the lock file; without that, `npm ci` on Amplify's Linux builders fails with "Missing … from lock file".
+- `amplify.yml` uses `npm install`, not `npm ci`, for the same lock-drift reason. The strict gates run in `.github/workflows/pr-check.yml`.
 
 ## Conventions
 

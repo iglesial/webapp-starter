@@ -39,8 +39,12 @@ npm run dev          # Vite dev server
 npm run build        # tsc -b && vite build
 npm run test:run     # Vitest (single run)
 npm run lint         # ESLint
-npm run typecheck    # tsc -b --noEmit
+npm run typecheck    # tsc -b --noEmit (app + amplify/)
+npm run test:e2e     # Playwright (starts its own dev server on :5199)
+npm run synth        # synthesize the Amplify backend locally — run after any amplify/ change
 ```
+
+CI (`.github/workflows/pr-check.yml`) runs typecheck, lint, unit tests and synth on every PR. `amplify.yml` is the Amplify Hosting build spec (Node 22, backend `pipeline-deploy`, then the frontend build).
 
 ## Next steps after using the template
 
