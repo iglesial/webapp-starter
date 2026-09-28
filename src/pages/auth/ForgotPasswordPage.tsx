@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Alert } from '../../components/core/Alert';
 import { Button } from '../../components/core/Button';
 import { FormField } from '../../components/core/FormField';
@@ -7,10 +8,12 @@ import { Input } from '../../components/core/Input';
 import { Spinner } from '../../components/core/Spinner';
 import { requestPasswordReset } from '../../services/authService';
 import { isAuthFailure, type AuthErrorCode } from '../../types/auth';
+import { authErrorCopy } from '../../i18n/authErrors';
 import './authShared.css';
 import './ForgotPasswordPage.css';
 
 export function ForgotPasswordPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [error, setError] = useState<AuthErrorCode | null>(null);
@@ -34,26 +37,18 @@ export function ForgotPasswordPage() {
   return (
     <div className="auth-page forgot-page">
       <header>
-        <h1 className="auth-page-title">Reset your password</h1>
-        <p className="auth-page-subtitle">
-          Enter the email on your account. We'll send you a reset code.
-        </p>
+        <h1 className="auth-page-title">{t('auth.forgotPassword.title')}</h1>
+        <p className="auth-page-subtitle">{t('auth.forgotPassword.subtitle')}</p>
       </header>
 
-      {error === 'RATE_LIMITED_TRY_LATER' && (
-        <Alert type="danger" title="Too many attempts.">
-          Please wait a moment and try again.
-        </Alert>
-      )}
-
-      {error && error !== 'RATE_LIMITED_TRY_LATER' && (
-        <Alert type="danger" title="We could not start the reset.">
-          Please try again.
+      {error && (
+        <Alert type="danger" title={t(authErrorCopy('forgotPassword', error).title)}>
+          {t(authErrorCopy('forgotPassword', error).body)}
         </Alert>
       )}
 
       <form className="auth-form" onSubmit={handleSubmit} noValidate>
-        <FormField label="Email" htmlFor="forgot-email" required>
+        <FormField label={t('auth.emailLabel')} htmlFor="forgot-email" required>
           <Input
             id="forgot-email"
             type="email"
@@ -67,13 +62,13 @@ export function ForgotPasswordPage() {
 
         <div className="auth-form-actions">
           <Button type="submit" variant="primary" size="large" fullWidth disabled={submitting}>
-            {submitting ? <Spinner size="small" color="white" /> : 'Send reset code'}
+            {submitting ? <Spinner size="small" color="white" /> : t('auth.forgotPassword.submit')}
           </Button>
         </div>
       </form>
 
       <div className="auth-page-footer-links">
-        <Link to="/signin">Back to sign in</Link>
+        <Link to="/signin">{t('auth.forgotPassword.backToSignIn')}</Link>
       </div>
     </div>
   );

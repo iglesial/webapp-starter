@@ -22,6 +22,7 @@ import {
   signOutCurrentUser,
   signUpWithDisplayName,
   updateDisplayName,
+  updateLocale,
 } from './authService';
 
 vi.mock('aws-amplify/auth', () => ({
@@ -234,8 +235,51 @@ describe('fetchCurrentUser', () => {
       email: 'a@b.co',
       displayName: 'Alice',
       emailVerified: true,
+      locale: null,
       groups: [],
     });
+  });
+
+  it('reads a saved language preference, ignoring unsupported values', async () => {
+    vi.mocked(fetchAuthSession).mockResolvedValue({
+      tokens: { idToken: { payload: { sub: 'sub-1' } } as any } as any,
+    });
+    vi.mocked(fetchUserAttributes).mockResolvedValue({
+      sub: 'sub-1',
+      email: 'a@b.co',
+      nickname: 'Alice',
+      email_verified: 'true',
+      locale: 'fr',
+    } as any);
+    expect((await fetchCurrentUser())?.locale).toBe('fr');
+
+    vi.mocked(fetchUserAttributes).mockResolvedValue({
+      sub: 'sub-1',
+      email: 'a@b.co',
+      nickname: 'Alice',
+      email_verified: 'true',
+      locale: 'de',
+    } as any);
+    expect((await fetchCurrentUser())?.locale).toBeNull();
+  });
+});
+
+describe('updateLocale', () => {
+  it('calls updateUserAttributes with the standard locale attribute', async () => {
+    vi.mocked(updateUserAttributes).mockResolvedValue({} as never);
+
+    const result = await updateLocale('fr');
+
+    expect(updateUserAttributes).toHaveBeenCalledWith({ userAttributes: { locale: 'fr' } });
+    expect(result.ok).toBe(true);
+  });
+
+  it('maps failures like the other auth calls', async () => {
+    vi.mocked(updateUserAttributes).mockRejectedValue(new Error('boom'));
+
+    const result = await updateLocale('en');
+
+    expect(result.ok).toBe(false);
   });
 });
 

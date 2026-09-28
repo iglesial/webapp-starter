@@ -19,6 +19,7 @@ The sandbox writes `amplify_outputs.json` into the repo root; `src/main.tsx` rea
 - `ProtectedRoute` and `AdminOnlyRoute` guards
 - Hand-rolled auth pages in `src/pages/auth/` — no `@aws-amplify/ui-react` form components
 - Core UI primitives in `src/components/core/` (Alert, Badge, Button, Card, FormField, Hero, Input, Modal, ProgressBar, Select, Spinner, Textarea) with colocated tests
+- i18n with `react-i18next`: English by default, French included, typed catalogs (a missing translation is a compile error), language saved to the Cognito account, `Intl` price/date formatters. Flip `DEFAULT_LOCALE` in `src/i18n/locale.ts` to change the default.
 - `HealthCheck` data model in `amplify/data/resource.ts` as a wiring example — replace with your own models
 
 ## Routes

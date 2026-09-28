@@ -55,7 +55,7 @@ describe('ProtectedRoute', () => {
       '/library',
       makeCtx({
         status: 'authenticated',
-        user: { sub: 's', email: 'a@b.co', displayName: 'A', emailVerified: true, groups: [] },
+        user: { sub: 's', email: 'a@b.co', displayName: 'A', emailVerified: true, locale: null, groups: [] },
       }),
     );
     expect(screen.getByTestId('library')).toBeInTheDocument();

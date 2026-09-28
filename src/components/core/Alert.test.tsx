@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Alert } from './Alert';
+import { rx } from '../../test/i18n';
 
 describe('Alert', () => {
   it('renders with default props', () => {
@@ -30,7 +31,7 @@ describe('Alert', () => {
 
   it('renders close button when onClose is provided', () => {
     render(<Alert onClose={() => {}}>Message</Alert>);
-    expect(screen.getByLabelText('Close')).toBeInTheDocument();
+    expect(screen.getByLabelText(rx('common.close'))).toBeInTheDocument();
   });
 
   it('does not render close button when onClose is not provided', () => {
@@ -41,7 +42,7 @@ describe('Alert', () => {
   it('calls onClose when close button is clicked', async () => {
     const handleClose = vi.fn();
     render(<Alert onClose={handleClose}>Message</Alert>);
-    await userEvent.click(screen.getByLabelText('Close'));
+    await userEvent.click(screen.getByLabelText(rx('common.close')));
     expect(handleClose).toHaveBeenCalledOnce();
   });
 

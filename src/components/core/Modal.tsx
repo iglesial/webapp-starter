@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import React, { useEffect } from 'react';
 import './Modal.css';
 
@@ -16,6 +17,7 @@ export const Modal: React.FC<ModalProps> = ({
   children,
   size = 'medium',
 }) => {
+  const { t } = useTranslation();
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -47,7 +49,7 @@ export const Modal: React.FC<ModalProps> = ({
         {title && (
           <div className="modal-header">
             <h2 className="modal-title">{title}</h2>
-            <button className="modal-close" onClick={onClose} aria-label="Close">
+            <button className="modal-close" onClick={onClose} aria-label={t('common.close')}>
               ×
             </button>
           </div>

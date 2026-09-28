@@ -5,6 +5,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthContext } from '../../contexts/AuthContext';
 import type { AuthContextValue, AuthStatus } from '../../types/auth';
 import { signUpWithDisplayName } from '../../services/authService';
+import { rx, rxIn } from '../../test/i18n';
+import { DISPLAY_NAME_LIMITS } from '../../utils/validation';
 import { SignUpPage } from './SignUpPage';
 
 vi.mock('../../services/authService', () => ({
@@ -26,7 +28,7 @@ function makeCtx(status: AuthStatus): AuthContextValue {
     status,
     user:
       status === 'authenticated'
-        ? { sub: 's', email: 'a@b.co', displayName: 'A', emailVerified: true, groups: [] }
+        ? { sub: 's', email: 'a@b.co', displayName: 'A', emailVerified: true, locale: null, groups: [] }
         : null,
     isAdmin: false,
     signOut: async () => {},
@@ -43,7 +45,7 @@ function renderPage(status: AuthStatus = 'unauthenticated') {
           <Route path="/confirm" element={<Landed />} />
           <Route path="/signin" element={<Landed />} />
           <Route path="/forgot-password" element={<Landed />} />
-          <Route path="/library" element={<Landed />} />
+          <Route path="/profile" element={<Landed />} />
         </Routes>
       </MemoryRouter>
     </AuthContext.Provider>,
@@ -52,9 +54,9 @@ function renderPage(status: AuthStatus = 'unauthenticated') {
 
 async function fillForm(name = 'Alice', email = 'a@b.co', password = 'Passw0rd!!') {
   const user = userEvent.setup();
-  await user.type(screen.getByLabelText(/email/i), email);
-  await user.type(screen.getByLabelText(/password/i), password);
-  await user.type(screen.getByLabelText(/display name/i), name);
+  await user.type(screen.getByLabelText(rxIn('auth.emailLabel')), email);
+  await user.type(screen.getByLabelText(rxIn('auth.passwordLabel')), password);
+  await user.type(screen.getByLabelText(rxIn('auth.displayNameLabel')), name);
   return user;
 }
 
@@ -63,16 +65,16 @@ beforeEach(() => {
 });
 
 describe('SignUpPage', () => {
-  it('redirects an already-authenticated visitor to /library', () => {
+  it('redirects an already-authenticated visitor to /profile', () => {
     renderPage('authenticated');
-    expect(screen.getByTestId('landed')).toHaveTextContent('/library');
+    expect(screen.getByTestId('landed')).toHaveTextContent('/profile');
   });
 
   it('submits valid credentials and routes to /confirm with email in state', async () => {
     vi.mocked(signUpWithDisplayName).mockResolvedValue({ ok: true, value: undefined });
     renderPage();
     const user = await fillForm();
-    await user.click(screen.getByRole('button', { name: /create account/i }));
+    await user.click(screen.getByRole('button', { name: rx('auth.signUp.submit') }));
     await waitFor(() => expect(screen.getByTestId('landed')).toHaveTextContent('/confirm|a@b.co'));
     expect(signUpWithDisplayName).toHaveBeenCalledWith({
       email: 'a@b.co',
@@ -84,8 +86,10 @@ describe('SignUpPage', () => {
   it('blocks submit and shows per-field error for a 2-char display name (FR-016)', async () => {
     renderPage();
     const user = await fillForm('ab');
-    await user.click(screen.getByRole('button', { name: /create account/i }));
-    expect(screen.getByText(/at least 3 characters/i)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: rx('auth.signUp.submit') }));
+    expect(
+      screen.getByText(rxIn('validation.displayName.tooShort', DISPLAY_NAME_LIMITS)),
+    ).toBeInTheDocument();
     expect(signUpWithDisplayName).not.toHaveBeenCalled();
   });
 
@@ -96,16 +100,24 @@ describe('SignUpPage', () => {
     });
     renderPage();
     const user = await fillForm();
-    await user.click(screen.getByRole('button', { name: /create account/i }));
+    await user.click(screen.getByRole('button', { name: rx('auth.signUp.submit') }));
     const alert = await screen.findByRole('alert');
-    expect(alert).toHaveTextContent(/already registered/i);
+    expect(alert).toHaveTextContent(rxIn('errors.auth.signUp.EMAIL_ALREADY_REGISTERED.title'));
     expect(alert.querySelector('a[href="/signin"]')).not.toBeNull();
     expect(alert.querySelector('a[href="/forgot-password"]')).not.toBeNull();
   });
 
   it('surfaces the password-policy rules as hint text', () => {
     renderPage();
-    expect(screen.getByText(/at least 10 characters/i)).toBeInTheDocument();
+    // Assert placement, not mere presence: the policy hint has to sit on the
+    // password field (a bare getByText(tt(...)) would read the catalog on both
+    // sides and prove nothing).
+    const passwordField = screen
+      .getByLabelText(rxIn('auth.passwordLabel'))
+      .closest('.form-field');
+    expect(passwordField?.querySelector('.form-field-helper')).toHaveTextContent(
+      rxIn('auth.passwordHint'),
+    );
   });
 
   it('maps PASSWORD_DOES_NOT_MEET_POLICY to a top alert', async () => {
@@ -115,18 +127,22 @@ describe('SignUpPage', () => {
     });
     renderPage();
     const user = await fillForm('Alice', 'a@b.co', 'weak');
-    await user.click(screen.getByRole('button', { name: /create account/i }));
-    await waitFor(() => expect(screen.getByText(/too weak/i)).toBeInTheDocument());
+    await user.click(screen.getByRole('button', { name: rx('auth.signUp.submit') }));
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        rxIn('errors.auth.signUp.PASSWORD_DOES_NOT_MEET_POLICY.title'),
+      ),
+    );
   });
 
   it('trims the email before submitting', async () => {
     vi.mocked(signUpWithDisplayName).mockResolvedValue({ ok: true, value: undefined });
     renderPage();
     const user = userEvent.setup();
-    await user.type(screen.getByLabelText(/email/i), '  a@b.co  ');
-    await user.type(screen.getByLabelText(/password/i), 'Passw0rd!!');
-    await user.type(screen.getByLabelText(/display name/i), 'Alice');
-    await user.click(screen.getByRole('button', { name: /create account/i }));
+    await user.type(screen.getByLabelText(rxIn('auth.emailLabel')), '  a@b.co  ');
+    await user.type(screen.getByLabelText(rxIn('auth.passwordLabel')), 'Passw0rd!!');
+    await user.type(screen.getByLabelText(rxIn('auth.displayNameLabel')), 'Alice');
+    await user.click(screen.getByRole('button', { name: rx('auth.signUp.submit') }));
     await waitFor(() =>
       expect(signUpWithDisplayName).toHaveBeenCalledWith(
         expect.objectContaining({ email: 'a@b.co' }),

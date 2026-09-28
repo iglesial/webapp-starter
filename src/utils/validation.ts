@@ -20,13 +20,25 @@ export function validateDisplayName(raw: string): DisplayNameValidation {
   return { valid: true, value: trimmed };
 }
 
-export function displayNameErrorMessage(reason: DisplayNameInvalid['reason']): string {
+// Interpolation values for the messages below, so callers don't repeat the
+// limits: t(displayNameErrorKey(reason), DISPLAY_NAME_LIMITS).
+export const DISPLAY_NAME_LIMITS = { min: DISPLAY_NAME_MIN, max: DISPLAY_NAME_MAX };
+
+// Returns a translation key rather than a string: this module stays pure and
+// language-agnostic, and the copy lives in the catalogs. The literal return
+// type keeps the key checked against the catalogs at the call site.
+export function displayNameErrorKey(
+  reason: DisplayNameInvalid['reason'],
+):
+  | 'validation.displayName.required'
+  | 'validation.displayName.tooShort'
+  | 'validation.displayName.tooLong' {
   switch (reason) {
     case 'empty':
-      return 'Display name is required.';
+      return 'validation.displayName.required';
     case 'too-short':
-      return `Display name must be at least ${DISPLAY_NAME_MIN} characters.`;
+      return 'validation.displayName.tooShort';
     case 'too-long':
-      return `Display name must be at most ${DISPLAY_NAME_MAX} characters.`;
+      return 'validation.displayName.tooLong';
   }
 }
