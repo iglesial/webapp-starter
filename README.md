@@ -75,6 +75,12 @@ Set these as **branch environment variables** in the Amplify console (they are r
 
 The webhook URL is a credential — anyone holding it can post to the channel. It is never logged; rotate it by deleting the webhook in Discord.
 
+## Working with Claude Code
+
+- `CLAUDE.md` holds the project's rules.
+- The `webapp-starter` skill (`.claude/skills/webapp-starter/`) holds the procedures: first-run setup, and checklists for adding a page, a data model, a Lambda and so on. Claude Code picks it up automatically in this repo; ask it to "set up this project from the template" to start.
+- `PORTED.md` records which parts came from the ai-upskill app.
+
 ## Next steps after using the template
 
 1. Rename `"webapp-starter"` in `package.json`.

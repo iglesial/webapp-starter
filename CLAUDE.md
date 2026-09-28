@@ -1,5 +1,7 @@
 # webapp-starter — Development Guidelines
 
+This file holds the **rules**. The step-by-step **procedures** live in the `webapp-starter` skill (`.claude/skills/webapp-starter/`). It covers first-run setup, and the multi-file checklists for adding a page, a per-user model, a Lambda, an upload or an admin section, and for enabling or removing a module. Use it before any change that spans layers.
+
 ## Stack
 
 - TypeScript 6, React 19.2 (strict mode), ES2022 via Vite 8.

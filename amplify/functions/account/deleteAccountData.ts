@@ -28,17 +28,24 @@ export interface AccountCleanup {
 // account leaves that data behind — which your privacy policy almost
 // certainly promises not to do. The template has no per-user models yet.
 //
-// An owner-authorized model (`allow.owner()`) stores `sub::username` in its
-// owner field. Give it a secondary index on that field and page through it:
+// Give each per-user model an explicit owner field holding the bare sub, and
+// index it (the webapp-starter skill, recipe 3):
+//
+//   ownerId: a.string().authorization((allow) => [   // no 'update': owners can't
+//     allow.ownerDefinedIn('ownerId').identityClaim('sub').to(['create', 'read', 'delete']),
+//   ]),                                                // hand rows to others
+//   .authorization((allow) => [allow.ownerDefinedIn('ownerId').identityClaim('sub')])
+//   .secondaryIndexes((index) => [index('ownerId')])      // → listNoteByOwnerId
+//
+// then page through that index here (verified to typecheck and synth):
 //
 //   import { collectAll, throwOnErrors } from '../shared/appsync';
 //
 //   {
 //     name: 'Note',
-//     run: async (client, { sub, username }) => {
+//     run: async (client, { sub }) => {
 //       const rows = await collectAll(
-//         (nextToken) =>
-//           client.models.Note.listNoteByOwner({ owner: `${sub}::${username}` }, { nextToken }),
+//         (nextToken) => client.models.Note.listNoteByOwnerId({ ownerId: sub }, { nextToken }),
 //         'note lookup',
 //       );
 //       for (const row of rows) {
