@@ -1,0 +1,93 @@
+/* Rendered Markdown. Headings are scaled DOWN from the global scale: an
+   author's `# Title` must not compete with the page's own <h1>. */
+.markdown-body {
+  line-height: 1.7;
+  color: var(--text-h);
+}
+
+.markdown-body > :first-child {
+  margin-top: 0;
+}
+
+.markdown-body h1 {
+  font-size: 1.5rem;
+  letter-spacing: normal;
+  margin: 2rem 0 0.75rem;
+}
+
+.markdown-body h2 {
+  font-size: 1.25rem;
+  margin: 1.75rem 0 0.5rem;
+}
+
+.markdown-body h3 {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.markdown-body p,
+.markdown-body ul,
+.markdown-body ol {
+  margin: 0 0 1rem;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  padding-left: 1.5rem;
+}
+
+.markdown-body li {
+  margin-bottom: 0.35rem;
+}
+
+.markdown-body a {
+  color: var(--accent);
+}
+
+.markdown-body code {
+  font-family: var(--mono);
+  font-size: 0.875em;
+  background: var(--code-bg);
+  padding: 0.1rem 0.35rem;
+  border-radius: var(--radius-sm);
+}
+
+.markdown-body pre {
+  background: var(--code-bg);
+  padding: 1rem;
+  border-radius: var(--radius);
+  /* Code samples are the one thing authors cannot reflow — let them scroll
+     rather than forcing the page to. */
+  overflow-x: auto;
+}
+
+.markdown-body pre code {
+  background: none;
+  padding: 0;
+}
+
+.markdown-body blockquote {
+  margin: 0 0 1rem;
+  padding-left: 1rem;
+  border-left: 3px solid var(--accent-border);
+  color: var(--text);
+}
+
+.markdown-body table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.markdown-body th,
+.markdown-body td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.markdown-body img {
+  max-width: 100%;
+  height: auto;
+}

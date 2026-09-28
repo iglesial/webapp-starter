@@ -11,6 +11,8 @@ import { validation } from './validation';
 import { profile } from './profile';
 import { account } from './account';
 import { legal } from './legal';
+// Optional module — see src/modules/markdown/README.md.
+import { markdown } from './markdown';
 import type { en } from '../en';
 
 type Translations<T> = { [K in keyof T]: T[K] extends string ? string : Translations<T[K]> };
@@ -26,4 +28,5 @@ export const fr: Translations<typeof en> = {
   profile,
   account,
   legal,
+  markdown,
 };
