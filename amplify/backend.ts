@@ -4,6 +4,7 @@ import { auth } from './auth/resource.js';
 import { data } from './data/resource.js';
 import { account } from './functions/account/resource.js';
 import { postConfirmation } from './functions/post-confirmation/resource.js';
+import { storage } from './storage/resource.js';
 
 const backend = defineBackend({
   auth,
@@ -14,6 +15,7 @@ const backend = defineBackend({
   // only to defineAuth is deployed but not exposed, and addEnvironment on it
   // would have nowhere to go.
   postConfirmation,
+  storage,
 });
 
 // Self-service account deletion removes the caller's Cognito user as its LAST
