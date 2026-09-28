@@ -36,7 +36,8 @@ src/
 ├── hooks/                  # useAuth, useLocale, useStorageUrl
 ├── modules/                # optional, self-contained features — each has a README with removal steps
 │   ├── markdown/           # SafeMarkdown + LazyMarkdown, directive allowlist (video, callout)
-│   └── payments/           # Stripe Checkout + Entitlements — OFF unless PAYMENTS_ENABLED (backend in amplify/modules/payments)
+│   ├── payments/           # Stripe Checkout + Entitlements — OFF unless PAYMENTS_ENABLED (backend in amplify/modules/payments)
+│   └── presentations/      # full-screen slide decks at /presentations (registry of lazy decks)
 ├── i18n/                   # i18next config, locale rules, Intl formatters, typed catalogs
 ├── pages/                  # HomePage, ProfilePage, auth/*, admin/* (English-only)
 ├── services/               # authService (Amplify wrapper)
@@ -60,6 +61,7 @@ Tests are colocated (`<Name>.test.ts(x)`); there is no top-level `tests/` direct
 - `/signup`, `/confirm`       — sign-up + email confirmation
 - `/signin`                   — sign-in
 - `/forgot-password`, `/forgot-password/confirm` — password reset flow
+- `/presentations`, `/presentations/:slug` — public, full-screen (outside AppShell): slide decks
 - `/legal`, `/privacy`        — public: legal notice, privacy policy (linked from the footer on every page)
 - `/profile`                  — ProtectedRoute: display name, language, sign out, self-service account deletion
 - `/admin`                    — AdminOnlyRoute (renders an Outlet): admin home, nest admin pages under it
@@ -144,3 +146,4 @@ Each module is self-contained, documented in its own `README.md` (usage, rules, 
 
 - **markdown** — render author-written Markdown. `rehype-raw`, a `urlTransform` override and `dangerouslySetInnerHTML` are forbidden (tests assert their absence); widgets are an allowlist in `directives.ts`; videos are click-to-load for privacy. Use `LazyMarkdown` so the parser stays out of the main bundle.
 - **payments** — **off by default** (`PAYMENTS_ENABLED=true` at synth time switches it on; its `secret()`s would otherwise fail every new project's first deploy). While off, none of its backend resources or routes exist, and the frontend learns that from the deployed schema (`isPaymentsEnabled()`), not a second flag. Its frontend and Lambdas are typed against the module's own `PaymentsSchema`, so they compile either way; CI synthesizes it switched on. Only the webhook writes `Entitlement`; the client never sends an amount; the buyer comes from the token. Read its README before changing it.
+- **presentations** — full-screen decks, routed OUTSIDE AppShell, one lazy chunk per deck (`registry.ts`). The deck chrome is translated; **slide text under `decks/` is authored content** and the one sanctioned exception to "no copy in JSX". Lazy decks are created once at module level — never `lazy()` during render (it remounts the deck).

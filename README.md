@@ -28,6 +28,7 @@ The sandbox writes `amplify_outputs.json` into the repo root; `src/main.tsx` rea
 - Optional cookieless analytics (Plausible) via `VITE_PLAUSIBLE_DOMAIN`
 - Optional modules in `src/modules/` (each removable — see its README):
   - **markdown**: safe Markdown rendering with an allowlisted `::video` (click-to-load) and `:::callout` widget, lazy-loaded
+  - **presentations**: full-screen slide decks at `/presentations` — keyboard navigation, staggered entrances, a word cloud, one lazy chunk per deck, and an example deck to copy
   - **payments** (switched off by default): one-time purchases via Stripe-hosted Checkout, a signature-verified webhook granting `Entitlement`s, checkout and success pages — see `src/modules/payments/README.md` to switch it on
 - Admin home at `/admin` (card grid; nest your admin pages under it), lazy-loaded
 - i18n with `react-i18next`: English by default, French included, typed catalogs (a missing translation is a compile error), language saved to the Cognito account, `Intl` price/date formatters. Flip `DEFAULT_LOCALE` in `src/i18n/locale.ts` to change the default.
@@ -41,6 +42,7 @@ The sandbox writes `amplify_outputs.json` into the repo root; `src/main.tsx` rea
 | `/signup`, `/confirm` | public | Sign-up + email verification |
 | `/signin` | public | Sign-in |
 | `/forgot-password`, `/forgot-password/confirm` | public | Password reset |
+| `/presentations`, `/presentations/:slug` | public | Slide decks, full-screen |
 | `/legal`, `/privacy` | public | Legal notice, privacy policy |
 | `/profile` | authenticated | Display name + sign out |
 | `/admin` | admin group | Admin home — nest admin pages under it |

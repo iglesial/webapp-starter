@@ -15,6 +15,8 @@ import { legal } from './legal';
 import { markdown } from './markdown';
 // Optional module — see src/modules/payments/README.md.
 import { payments } from './payments';
+// Optional module — see src/modules/presentations/README.md.
+import { presentations } from './presentations';
 import type { en } from '../en';
 
 type Translations<T> = { [K in keyof T]: T[K] extends string ? string : Translations<T[K]> };
@@ -32,4 +34,5 @@ export const fr: Translations<typeof en> = {
   legal,
   markdown,
   payments,
+  presentations,
 };
